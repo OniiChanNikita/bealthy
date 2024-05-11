@@ -28,7 +28,9 @@ export const Login = () => {
 
     localStorage.setItem('access_token', data.access);
 
-    localStorage.setItem('refresh_token', data.refresh);   
+    localStorage.setItem('refresh_token', data.refresh);  
+
+    localStorage.setItem('username', username) 
 
     //axios.defaults.headers.common['Authorization'] = `Bearer ${data['access']}`;
 

@@ -153,6 +153,9 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATIC_ROOT = path.join(BASE_DIR,'static/')
 
+MEDIA_ROOT =  path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
+
 #CKEDITOR_BASEPATH = "/static/ckeditor/ckeditor/"
 #CKEDITOR_UPLOAD_PATH = "uploads/" 
 #CKEDITOR_IMAGE_BACKEND = "pillow" 

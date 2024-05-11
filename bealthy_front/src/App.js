@@ -5,11 +5,10 @@ import {Navigation} from './component/navigation';
 import {Logout} from './component/logout';
 
 function App() {
-  console.log(localStorage.getItem('access_token'))
   return <BrowserRouter>
       <Navigation></Navigation>
       <Routes>
-        <Route path="/" element={<Home/>}/>
+        <Route path="/post" element={<Home/>}/>
         <Route path="/login" element={<Login/>}/>
         <Route path="/logout" element={<Logout/>}/>
       </Routes>

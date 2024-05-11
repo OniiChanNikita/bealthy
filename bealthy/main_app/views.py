@@ -11,9 +11,29 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
 
-from .models import Profile, Research, Images, Post
-from .serializer import ProfileSerializer, ResearchSerializer, ImageSerializer
+from .models import Profile, Research, Image, Post
+from .serializer import ProfileSerializer, ResearchSerializer, ImageSerializer, PostSerializer
 
+from django.conf import settings
+import os
+
+@api_view(['POST'])
+def get_url_image(request):
+	print(request.data.get('pk_image')[0], type(request.data.get('pk_image')[0]))
+	image_path = Image.objects.get(pk = request.data.get('pk_image')[0]).image.url
+	return Response({'image_path': image_path})
+
+
+def get_image(request, image_name):
+	print(image_name)
+	image_path = os.path.join(settings.MEDIA_ROOT, image_name)
+	try:
+		with open(image_path, "rb") as image_file:
+			image_data = image_file.read()
+			response = HttpResponse(image_data, content_type='image/jpeg')
+			return response
+	except:
+		print('NOT FOUND IMG')
 
 class Home(APIView):
 	# authentication_classes = [JWTAuthentication]
@@ -57,10 +77,20 @@ def getResearch(request):
 	return Response(serializer.data)
 
 
+@api_view(['GET'])
+def getPost(request):
+	permission_classes = [IsAuthenticated]
+	authentication_classes = [JWTAuthentication]
+
+	posts = Post.objects.filter(user = Profile.objects.get(name = request.user))
+	serializer = PostSerializer(posts, many=True)
+	return Response(serializer.data)
+
+
 @api_view(['GET', 'POST'])
 def getImage(request):
 	# if request.method == 'GET':
-	# 	images = Images.objects.all()
+	# 	images = Image.objects.all()
 	# 	serializer = ImageSerializer(images, many=True)
 	# if request.method == 'POST':
 	# 	serializer = ImageSerializer(data=request.data)

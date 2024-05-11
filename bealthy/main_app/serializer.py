@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Profile, Research, Images, Post
+from .models import Profile, Research, Image, Post
 
 class ProfileSerializer(serializers.ModelSerializer):
 	class Meta:
@@ -15,6 +15,11 @@ class ResearchSerializer(serializers.ModelSerializer):
 
 class ImageSerializer(serializers.ModelSerializer):
 	class Meta:
-		model = Images
+		model = Image
 		fields=('image','description')
 		
+
+class PostSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = Post
+		fields=('title', 'type_post', 'content', 'research', 'image')

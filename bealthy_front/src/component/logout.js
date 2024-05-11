@@ -3,7 +3,7 @@ import axios from "axios";
 
 export const Logout = () => {
     useEffect(() => {
-       (async () => {
+       (async e => {
             try {
                 const {data} = await axios.post(
                     'http://localhost:8000/logout/',
