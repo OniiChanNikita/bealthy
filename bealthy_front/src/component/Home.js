@@ -5,7 +5,6 @@ import axios from "axios";
 export const Home = () => {
 
     const [posts, setPosts] = useState({}); 
-    const [imagePath, setImagePath] = useState('#')    
     useEffect(() => {    
         if(localStorage.getItem('access_token') === null){                               
             window.location.href = '/login'
@@ -20,27 +19,22 @@ export const Home = () => {
                         }
                     });
 
-                    // Установка полученных данных в состояние
                     setPosts(data);
                     console.log(data);
 
-                    // Получение значения image из первых данных
-                    const image_name = {
-                        pk_image: data['1'].image
-                    };
-                    console.log(image_name);
+                    /*for (const property in data) {
+                        image_name[localStorage.getItem('username')+'.'+data[property].content] = data[property].image
+                    }
+                    console.log(image_name);*/
 
-                    // Выполнение второго запроса для получения image_path
-                    const {data: image_path} = await axios.post('http://localhost:8000/image/', image_name, {
+                    /*const {data: {image_path}} = await axios.post('http://localhost:8000/image/', image_name, {
                         headers: {
                             'Content-Type': 'application/json',
                             'Authorization': 'Bearer ' + localStorage.getItem('access_token')
                         }
-                    });
+                    });*/
 
-                    // Установка полученного image_path в состояние
-                    setImagePath('http://localhost:8000'+image_path.image_path);
-                    console.log(image_path);
+                    /*console.log(image_path);*/
                 } catch (error) {
                     console.error('Error:', error);
                 }
@@ -51,7 +45,7 @@ export const Home = () => {
         {Object.keys(posts).map(key => (
         <div className="col" key={key} style={{maxWidth: 30+'%'}}>
             <div className="card">
-                <img src='http://localhost:8000/images/bez.jpg' className="card-img-top"/>
+                <img src={'http://localhost:8000'+posts[key].main_image.image} className="card-img-top"/>
                 <div className="card-body">
                    <h5 className="card-title">{posts[key].title}</h5>
                    <p className="card-text">{posts[key].content}</p>

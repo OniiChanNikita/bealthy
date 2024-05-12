@@ -13,7 +13,8 @@ urlpatterns = [
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),  
     path('logout/', views.LogoutView.as_view(), name ='logout'),
+    path('signup/', views.CreateUserView.as_view(), name = 'signup' )
 
-    path('images/<str:image_name>/', views.get_image, name='get_image'),
-    path('image/', views.get_url_image)
+    # path('images/<str:image_name>/', views.get_image, name='get_image'),
+    #path('image/', views.get_url_image)
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

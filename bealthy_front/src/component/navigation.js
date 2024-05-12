@@ -17,8 +17,8 @@ export function Navigation() {
         {isAuth ? <Nav.Link href="/post">Home</Nav.Link> : null}
         </Nav>
         <Nav>
-        {isAuth ? <Nav.Link href="/logout">Logout</Nav.Link> :  
-                  <Nav.Link href="/login">Login</Nav.Link>}
+        {isAuth ? <Nav.Link href="/logout">Logout</Nav.Link>: <Nav.Link href="/login">Login</Nav.Link>}
+        {isAuth ? null: <Nav.Link href="/signup">Sign up</Nav.Link>}
         </Nav>
         <Nav>
         {isAuth ? <Nav.Link href="/profile">{localStorage.getItem('username')}</Nav.Link> : null}
