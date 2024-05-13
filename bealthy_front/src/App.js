@@ -4,6 +4,7 @@ import {Home} from "./component/Home";
 import {Navigation} from './component/navigation';
 import {Logout} from './component/logout';
 import {Signup} from './component/signup';
+import {UploadPost} from './component/UploadPost';
 
 function App() {
   return <BrowserRouter>
@@ -13,6 +14,8 @@ function App() {
         <Route path="/logout" element={<Logout/>}/>
         <Route path="/signup" element={<Signup/>}/>
         <Route path="/post" element={<Home/>}/>
+        <Route path="/upload_post" element={<UploadPost/>}/>
+
       </Routes>
     </BrowserRouter>;
 }

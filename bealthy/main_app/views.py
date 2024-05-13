@@ -67,8 +67,6 @@ class CreateUserView(APIView):
 			print('not work')
 			return Response({'res': 'not_created'})
 
-
-
 @api_view(['GET', 'POST'])
 def getUser(request):
 	if request.method == 'GET':
@@ -92,37 +90,44 @@ def getResearch(request):
 	return Response(serializer.data)
 
 
-@api_view(['GET'])
-def getPost(request):
+@api_view(['GET', 'POST'])
+class getPost(APIView):
 	permission_classes = [IsAuthenticated]
 	authentication_classes = [JWTAuthentication]
 
-	posts = Post.objects.filter(user = Profile.objects.get(name = request.user))
-	serializer = PostSerializer(posts, many=True)
+	def post(self, request):
+		list_researches = []
+		for num_reseach in range(len(reseaches)):
+			list_researches.append(Research.objects.create(request.data.reseaches[reseach]))
+		if request.FILES.get('main_image'):
+			list_image = []
+			#for img in request.data
+			list_image.append(Image.objects.craete(request.data['main_image']))
+		if request.FILES.get('image'):
+			image = Image.objects.create(request.FILES['image'])
+		post = Post.objects.create()
+		
 
-	return Response(serializer.data)
-
-
-@api_view(['GET', 'POST'])
-def getImage(request):
-	# if request.method == 'GET':
-	# 	images = Image.objects.all()
-	# 	serializer = ImageSerializer(images, many=True)
-	# if request.method == 'POST':
-	# 	serializer = ImageSerializer(data=request.data)
-	# 	if serializer.is_valid():
-	# 		serializer.save()
-	# return Response(serializer.data)
-
-	if request.method == 'GET':
-		image = Images.objects.filter().first().image
-	return HttpResponse(image, content_type='image/jpg')
+	def get(self, request):
+		posts = Post.objects.filter(user = Profile.objects.get(name = request.user))
+		serializer = PostSerializer(posts, many=True)
+	
+		return Response(serializer.data)
 
 
 
+# @api_view(['GET', 'POST'])
+# def getImage(request):
+# 	# if request.method == 'GET':
+# 	# 	images = Image.objects.all()
+# 	# 	serializer = ImageSerializer(images, many=True)
+# 	# if request.method == 'POST':
+# 	# 	serializer = ImageSerializer(data=request.data)
+# 	# 	if serializer.is_valid():
+# 	# 		serializer.save()
+# 	# return Response(serializer.data)
 
-
-
-
-
+# 	if request.method == 'GET':
+# 		image = Images.objects.filter().first().image
+# 	return HttpResponse(image, content_type='image/jpg')
 
