@@ -80,6 +80,7 @@ def getUser(request):
 
 @api_view(['GET', 'POST'])
 def getResearch(request):
+	authentication_classes = [JWTAuthentication, ]
 	if request.method == 'GET':
 		researches = Research.objects.all()
 		serializer = ResearchSerializer(researches, many=True)
