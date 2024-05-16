@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Button, Modal, Form } from 'react-bootstrap';
+import { Button, Modal, Form, Dropdown } from 'react-bootstrap';
 
 export const UploadPost = () => {
+  const formData = new FormData();
+
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
   const [imageLogo, setImageLogo] = useState(null)
   const [images, setImages] = useState([])
 
@@ -15,6 +19,22 @@ export const UploadPost = () => {
   const [appendResearch, setAppendResearch] = useState([])
 
   const [research, setResearch] = useState([])
+
+  const [selectedTypePost, setSelectedTypePost] = useState(null);
+
+  const handleItemClick = (item) => {
+    setSelectedTypePost(item);
+    console.log(item)
+  };
+
+  const handleTitleChange = (e) => {
+    setTitle(e.target.value);
+  };
+
+  const handleDescriptionChange = (e) => {
+    setDescription(e.target.value);
+  };
+
 
   const handleClose = () => setShowModal(false);
   const handleShow = async () => {
@@ -71,56 +91,64 @@ export const UploadPost = () => {
     const newId = fileInputs.length + 1;
     setFileInputs([...fileInputs, { id: newId , file: { name: 'Выбрать изображения к публикации'}}]);
   };
-
-  const handleSubmit = async () => {
-    const formData = new FormData();
-
+/////////////////////////////////////////////////////
+  const handleSubmit = () => {
+    // Добавление данных в formData
     formData.append('imageLogo', imageLogo);
-    for (let i = 0; i < images.length; i++){
+    formData.append('title', title);
+    formData.append('description', description);
+    formData.append('researches', appendResearch);
+    formData.append('selectedTypePost', selectedTypePost);
+    for (let i = 0; i < images.length; i++) {
       formData.append(`image${i}`, images[i]);
     }
-    const datas = {formData, appendResearch}
-    
-    console.log(datas)
+    console.log(formData)
 
+    // Отправка запроса с помощью axios после завершения добавления данных
+    const handleSubmitPost = async () => {
+      try {
+        console.log('await');
+        const response = await axios.post('http://localhost:8000/post/', formData,
+        {
+          headers: {
+              'Content-Type': 'multipart/form-data',
+              'Authorization': 'Bearer ' + localStorage.getItem('access_token')
+          }
+        });
+        console.log(response.data);
+      } catch (e) {
+        console.log('logout not working', e);
+      }
+    };
 
-    try {
-
-      const response = await axios.post('YOUR_API_ENDPOINT', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          Authorization: 'Bearer ' + localStorage.getItem('access_token'),
-        },
-      });
-      console.log(response.data);
-    } catch (error) {
-      console.error(error);
-    }
+    // Вызов функции отправки запроса
+    handleSubmitPost();
   };
+
 
   return (
     <div>
-    <form className="conteiner d-flex flex-column m-5 " style={{overflow: 'hidden', gap: '30px', borderRadius: '5px', borderWidth: "2px", borderColor: "#C0C0C0", borderStyle: "solid", backgroundColor: "#F3F4E9"}}>
+    <form  encType='multipart/form-data' onSubmit={() => {return false}} className="conteiner d-flex flex-column m-5 " style={{overflow: 'hidden', gap: '30px', borderRadius: '5px', borderWidth: "2px", borderColor: "#C0C0C0", borderStyle: "solid", backgroundColor: "#F3F4E9"}}>
 
       
                
       <div className="file-upload" style={{ borderColor: '#6da047', borderStyle:'dashed', borderWidth: '0 0 2px 0', position: "relative", overflow: "hidden", minHeight: "20vh", width: "100%", background: "rgba(109,160,71,0.35)", color: "#6da047", textAlign: "center"}}>
              <label style={{padding: '7vh 0 7vh 0', display: "block", position: "absolute", top: "0", bottom: "0", left: "0", width: "100%", height: "100%", cursor: "pointer"}}>
-                  <input style = {{display: 'none'}} type="file" accept="image/*" onChange={handleImageChangeLogo} />
+                  <input required style = {{display: 'none'}} type="file" accept="image/*" onChange={handleImageChangeLogo} />
                   <span style = {{fontSize: '4vh'}} className="filename" id='filename'>{fileNameLogo}</span>
              </label>
       </div>
       <div className='conteiner p-5 d-flex flex-column' style={{gap: '30px'}}> 
         
 
-        <input type="text" placeholder='Post name...' style={{outline: 'none', backgroundColor: 'transparent', borderWidth: '0 0 2px 0', width: "50%", borderColor: '#8b8b8b'}}/>
-        <textarea type="text" placeholder='Post content...' style={{minHeight: '50vh', maxHeight: '50vh', outline: 'none', borderRadius: '3px', backgroundColor: 'transparent', width: "100%", borderColor: '#8b8b8b'}}/>
+        <input required value={title} onChange={handleTitleChange} style={{outline: 'none', backgroundColor: 'transparent', borderWidth: '0 0 2px 0', width: "50%", borderColor: '#8b8b8b'}}/>
+        <textarea required value={description} onChange={handleDescriptionChange} type="text" placeholder='Post content...' style={{minHeight: '50vh', maxHeight: '50vh', outline: 'none', borderRadius: '3px', backgroundColor: 'transparent', width: "100%", borderColor: '#8b8b8b'}}/>
 
         <div className='conteiner d-flex flex-row flex-wrap' style={{gap: "10px"}}>
           {fileInputs.map((input, index) => (
             <div key={input.id} className="file-upload" style={{ borderColor: '#6da047', borderStyle:'dashed', position: "relative", overflow: "hidden", minHeight: "20vh", width: "20vh", background: "rgba(109,160,71,0.35)", color: "#6da047", textAlign: "center"}}>
                  <label  style={{ padding: '5vh 5px 7vh 5px',  display: "block", position: "absolute", top: "0", bottom: "0", width: "100%", height: "100%", cursor: "pointer"}}>
-                      <input name = {`file-${input.id}`} style = {{display: 'none'}} type="file" accept="image/*" onChange={(e) => handleImageChange(index, e)} />
+                      <input /*name = {`file${input.id}`}*/ style = {{display: 'none'}} type="file" accept="image/*" onChange={(e) => handleImageChange(index, e)} />
                       <span style = {{fontSize: '2vh'}} disabled className="filename" id='filename'>{fileInputs[index].file.name}</span>
                  </label>
             </div>
@@ -137,7 +165,21 @@ export const UploadPost = () => {
           Добавить исследования
         </button>
 
-        <button style={{marginLeft: 'auto', width: '10%'}} onClick={handleSubmit}>Upload Post</button>
+
+        <Dropdown required onSelect={handleItemClick} drop="down">
+          <Dropdown.Toggle variant="primary" id="dropdownMenuDark">
+            {selectedTypePost ? selectedTypePost : "Select an item"}
+          </Dropdown.Toggle>
+          <Dropdown.Menu variant="dark">
+            <Dropdown.Item eventKey="traning">traning program</Dropdown.Item>
+            <Dropdown.Item eventKey="nutrion">nutrion program</Dropdown.Item>
+            <Dropdown.Item eventKey="product">products recommended</Dropdown.Item>
+          </Dropdown.Menu>
+        </Dropdown>
+
+              
+
+        <button type="button" style={{marginLeft: 'auto', width: '10%'}} onClick={handleSubmit}>Upload Post</button>
       </div>
     </form>
     <Modal show={showModal} onHide={handleClose}>

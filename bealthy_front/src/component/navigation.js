@@ -11,7 +11,7 @@ export function Navigation() {
     }
   }, [isAuth]);
   return ( 
-    <div>
+    <div>    
       <Navbar bg="dark" variant="dark" >
         <Nav className="me-auto"> 
         {isAuth ? <Nav.Link href="/post">Home</Nav.Link> : null}

@@ -8,7 +8,7 @@ from django.conf import settings
 urlpatterns = [
     path('', views.Home.as_view()),
     path('profile/', views.getUser),
-    path('post/', views.getPost),
+    path('post/', views.getPost.as_view()),
     path('research/', views.getResearch),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),  

@@ -31,10 +31,10 @@ class Research(models.Model): #исследования
 
 class Image(models.Model):
 	image = models.ImageField(upload_to = image_file_path)
-	description = models.CharField(max_length=255)
+	description = models.CharField(max_length=255, null = True)
 
 	def __str__(self):
-		return self.description
+ 		return self.image.url
 
 class Post(models.Model):
 	TYPE_POSTS = (
