@@ -5,6 +5,7 @@ import {Navigation} from './component/navigation';
 import {Logout} from './component/logout';
 import {Signup} from './component/signup';
 import {UploadPost} from './component/UploadPost';
+import {Post} from './component/Post';
 
 function App() {
   return <BrowserRouter>
@@ -14,6 +15,7 @@ function App() {
         <Route path="/logout" element={<Logout/>}/>
         <Route path="/signup" element={<Signup/>}/>
         <Route path="/post" element={<Home/>}/>
+        <Route exact={true} path="/post/:slug" element={<Post/>}/>
         <Route path="/upload_post" element={<UploadPost/>}/>
 
       </Routes>

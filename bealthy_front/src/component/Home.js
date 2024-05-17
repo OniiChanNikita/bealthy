@@ -21,6 +21,8 @@ export const Home = () => {
 
                     setPosts(data);
                     console.log(data);
+                    console.log(posts[0])       
+
 
                     /*for (const property in data) {
                         image_name[localStorage.getItem('username')+'.'+data[property].content] = data[property].image
@@ -39,20 +41,25 @@ export const Home = () => {
                     console.error('Error:', error);
                 }
             })();
-        };       
+        };
     }, []);     
-    return <div className="row row-cols-1 row-cols-sm-2 g-3" style={{margin: 10+'px'}}>
+    return <div className='d-flex flex-column'>
+    { posts[0] == undefined ? <p style={{width: '100%', marginTop: '10%'}} className="text-center h3">У вас нету публикаций, хотите создать новую?</p> : null}
+    { posts[0] == undefined ? <a style={{margin: '10px auto 0 auto', width: '30%'}} href = 'upload_post/' class="center btn btn-outline-warning">Создать публикацию</a> : null}
+    <div className="row row-cols-1 row-cols-sm-2 g-3" style={{margin: 10+'px'}}>
+        
         {Object.keys(posts).map(key => (
-        <div className="col" key={key} style={{maxWidth: 30+'%'}}>
+        <a href = {'post/'+posts[key].slug_post+'/'} className="col" key={key} style={{width: '350px', height: '390px', maxWidth: 30+'%'}}>
             <div className="card">
-                <img src={'http://localhost:8000'+posts[key].main_image.image} className="card-img-top"/>
+                <img class="img-thumbnail" style={{margin: '0 auto 0 auto', width: '100%', maxWidth: '300px', maxHeight: '300px'}} src={'http://localhost:8000'+posts[key].main_image.image} className="card-img-top"/>
                 <div className="card-body">
                    <h5 className="card-title">{posts[key].title}</h5>
                    <p className="card-text">{posts[key].content}</p>
                 </div>
             </div>
-        </div>
+        </a>
         ))}
+    </div>      
     </div>      
 }
 

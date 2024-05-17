@@ -94,6 +94,10 @@ export const UploadPost = () => {
 /////////////////////////////////////////////////////
   const handleSubmit = () => {
     // Добавление данных в formData
+    console.log(imageLogo, title, description, selectedTypePost)
+    if (imageLogo == null || title == '' || description == '' || selectedTypePost == null){
+      return alert('Вы не ввели все данные')
+    }
     formData.append('imageLogo', imageLogo);
     formData.append('title', title);
     formData.append('description', description);
@@ -141,7 +145,7 @@ export const UploadPost = () => {
       <div className='conteiner p-5 d-flex flex-column' style={{gap: '30px'}}> 
         
 
-        <input required value={title} onChange={handleTitleChange} style={{outline: 'none', backgroundColor: 'transparent', borderWidth: '0 0 2px 0', width: "50%", borderColor: '#8b8b8b'}}/>
+        <input required value={title} onChange={handleTitleChange} placeholder='Title...' style={{outline: 'none', backgroundColor: 'transparent', borderWidth: '0 0 2px 0', width: "50%", borderColor: '#8b8b8b'}}/>
         <textarea required value={description} onChange={handleDescriptionChange} type="text" placeholder='Post content...' style={{minHeight: '50vh', maxHeight: '50vh', outline: 'none', borderRadius: '3px', backgroundColor: 'transparent', width: "100%", borderColor: '#8b8b8b'}}/>
 
         <div className='conteiner d-flex flex-row flex-wrap' style={{gap: "10px"}}>
@@ -179,7 +183,7 @@ export const UploadPost = () => {
 
               
 
-        <button type="button" style={{marginLeft: 'auto', width: '10%'}} onClick={handleSubmit}>Upload Post</button>
+        <button type="button" className='btn' style={{marginLeft: 'auto', width: '10%', color: '#63C5DA'}} onClick={handleSubmit}>Upload Post</button>
       </div>
     </form>
     <Modal show={showModal} onHide={handleClose}>

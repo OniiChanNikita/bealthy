@@ -22,6 +22,7 @@ class ImageSerializer(serializers.ModelSerializer):
 class PostSerializer(serializers.ModelSerializer):
 	image = ImageSerializer(many=True, read_only=True)
 	main_image = ImageSerializer(many=False, read_only=True)
+	research = ResearchSerializer(many=True, read_only=True)
 	class Meta:
 		model = Post
-		fields=['title', 'type_post', 'content', 'research', 'image', 'main_image']
+		fields=['title', 'type_post', 'content', 'research', 'image', 'main_image', 'slug_post']

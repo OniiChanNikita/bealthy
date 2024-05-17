@@ -1,5 +1,5 @@
-from django.shortcuts import render
-from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
+#from django.http import HttpResponse
 from django.conf import settings
 
 from rest_framework.views import APIView 
@@ -16,6 +16,10 @@ from .models import Profile, Research, Image, Post
 from django.contrib.auth.models import User
 
 import os
+
+from django.utils.crypto import get_random_string
+
+
 
 # @api_view(['POST'])
 # def get_url_image(request):
@@ -92,54 +96,41 @@ def getResearch(request):
 	return Response(serializer.data)
 
 
-class getPost(APIView):
+class getPosts(APIView):
 	permission_classes = [IsAuthenticated, ]
 	authentication_classes = [JWTAuthentication, ]
 
 	def post(self, request):
 		print(request.data)
 		images = list(request.data.keys())[5::]
+		print(images)
 		images_objs = []
 		researches = []
 		main_image = Image.objects.create(image = request.data['imageLogo'])
 		post = Post.objects.create(title = request.data['title'],
 		 	user = Profile.objects.get(name = request.user),
 		 	content = request.data['description'],
-		 	main_image = main_image)
+		 	main_image = main_image, type_post = request.data['selectedTypePost'], slug_post = get_random_string(10, '0123456789'))
 		print('post_created')
-		for i in images:
-			images_objs.append(Image.objects.create(image = request.data[i]))
-		for i in images_objs:
-			post.image.add(i)
-			post.save()
-		print('image_added')
+		if images != []:
+			for i in images:
+				images_objs.append(Image.objects.create(image = request.data[i]))
+			for i in images_objs:
+				post.image.add(i)
+				post.save()
+			print('image_added')
 
-
-		for i in request.data['researches'].split(','):
-			researches.append(Research.objects.get(name=i))
-		for i in researches:
-			post.research.add(i)
-			post.save()
-		print('research_added')
+		if request.data.get('researches') != '':
+			for i in request.data['researches'].split(','):
+				researches.append(Research.objects.get(name=i))
+			if researches != []:
+				for i in researches:
+					post.research.add(i)
+					post.save()
+				print('research_added')
 
 		print(post)
-
-	
-		
-		#print(main_image)
-
-		return Response()#PostSerializer(data=request.data, many=True)
-		# list_researches = []
-		# for num_reseach in range(len(reseaches)):
-		# 	list_researches.append(Research.objects.create(request.data.reseaches[reseach]))
-		# if request.FILES.get('main_image'):
-		# 	list_image = []
-		# 	#for img in request.data
-		# 	list_image.append(Image.objects.craete(request.data['main_image']))
-		# if request.FILES.get('image'):
-		# 	image = Image.objects.create(request.FILES['image'])
-		# post = Post.objects.create()
-		
+		return Response()
 
 	def get(self, request):
 		print(Profile.objects.get(name = request.user), 'ss')
@@ -149,20 +140,14 @@ class getPost(APIView):
 	
 		return Response(serializer.data)
 
+class getPost(APIView):
+	permission_classes = [IsAuthenticated, ]
+	authentication_classes = [JWTAuthentication, ]
 
-
-# @api_view(['GET', 'POST'])
-# def getImage(request):
-# 	# if request.method == 'GET':
-# 	# 	images = Image.objects.all()
-# 	# 	serializer = ImageSerializer(images, many=True)
-# 	# if request.method == 'POST':
-# 	# 	serializer = ImageSerializer(data=request.data)
-# 	# 	if serializer.is_valid():
-# 	# 		serializer.save()
-# 	# return Response(serializer.data)
-
-# 	if request.method == 'GET':
-# 		image = Images.objects.filter().first().image
-# 	return HttpResponse(image, content_type='image/jpg')
-
+	def get(self, request, slug_post): 
+		get_object_post = get_object_or_404(Post, slug_post=slug_post)
+		if request.user == get_object_post.user.name:
+			print(get_object_post)
+			return Response(PostSerializer(get_object_post, many=False).data)
+		else:
+			return Response()
