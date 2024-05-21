@@ -22,7 +22,8 @@ export const Login = () => {
         },
       }
     );
-    alert(data.access)
+
+    console.log(data.access)
 
     localStorage.clear();
 
@@ -30,7 +31,22 @@ export const Login = () => {
 
     localStorage.setItem('refresh_token', data.refresh);  
 
-    console.log(localStorage.getItem('access_token'), localStorage.getItem('refresh_token'))
+
+ 
+    const user_data = await axios.get(
+      'http://localhost:8000/data/user/',
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + localStorage.getItem('access_token')
+        },
+      }
+    );
+    localStorage.setItem('userData', user_data.data.slug_profile);
+    
+
+
+    console.log(localStorage.getItem('access_token'), localStorage.getItem('refresh_token'), localStorage.getItem('userData'))
 
     localStorage.setItem('username', username) 
 

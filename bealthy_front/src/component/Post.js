@@ -1,24 +1,25 @@
-// Import the react JS packages 
+// Import the necessary packages
 import axios from "axios";
-import { useState, useEffect } from "react";// Define the Login function.
+import { useState, useEffect } from "react";
 import { useLocation } from 'react-router-dom';
-import { Container, Row, Col, Card } from 'react-bootstrap';
+import { Container, Row, Col, Card, Form, Button, Alert } from 'react-bootstrap';
 
 export const Post = () => {
   const currentUrl = useLocation().pathname;
+  const [post, setPost] = useState({user: {name: {}}, image: [''], main_image: {}, image: [{}], title: '', type_post: '', content: '', research: [{}]});
+  const [currentUser, setCurrentUser] = useState(localStorage.getItem('username'));
+  const [review, setReview] = useState('');
+  const [reviews, setReviews] = useState([]);
+  const [reviewSubmitted, setReviewSubmitted] = useState(false);
 
-  const [post, setPost] = useState({user: {name: {}}, main_image: {}, image: [{}], title: '', type_post: '', content: '', research: [{}]})
-  console.log(currentUrl)
   useEffect(() => {
-    if(localStorage.getItem('access_token') === null){                               
-      window.location.href = '/login'
-
-    }
-    else{
-      (async () => {
-          console.log('http://localhost:8000'+currentUrl)
-          const {data} = await axios.get(
-            'http://localhost:8000'+currentUrl,
+    const fetchPostData = async () => {
+      if(localStorage.getItem('access_token') === null){                               
+        window.location.href = '/login';
+      } else {
+        try {
+          const {data: postData} = await axios.get(
+            `http://localhost:8000${currentUrl}`,
             {
               headers: {
                 'Content-Type': 'application/json',
@@ -26,18 +27,53 @@ export const Post = () => {
               },
             }
           );
-          console.log(data)
-          setPost(data)
+          setPost(postData);
+          console.log(currentUser, post)
 
-        
-      })();
+          const {data: reviewsData} = await axios.get(
+            `http://localhost:8000${currentUrl}reviews/`,
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('access_token')
+              },
+            }
+          );
+          console.log(reviewsData)
+          setReviews(reviewsData);
+          setReviewSubmitted(false)
 
+        } catch (error) {
+          console.error(error);
+        }
+      }
     };
-  }, []);    
+
+    fetchPostData();
+  }, [currentUrl, reviewSubmitted]);
+
+  const handleReviewSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post(
+        `http://localhost:8000${currentUrl}reviews/`,
+        { content: review },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + localStorage.getItem('access_token')
+          },
+        }
+      );
+      setReview('');
+      setReviewSubmitted(true);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return(      
-        
-      <Container className="my-5 w-90">
+    <Container className="my-5 w-90">
       <Row className="justify-content-center">
         <Col md={10}>
           <Card className="border-0 shadow-lg rounded overflow-hidden">
@@ -86,8 +122,42 @@ export const Post = () => {
               </Card.Body>
             )}
           </Card>
+          {currentUser !== post.user.name.username && (
+            <Card className="border-0 shadow-lg rounded overflow-hidden mt-4">
+              <Card.Body>
+                <Card.Title className="mb-4" style={{ fontSize: '1.5rem', textAlign: 'left' }}>Leave a Review</Card.Title>
+                <Form onSubmit={handleReviewSubmit}>
+                  <Form.Group controlId="reviewTextarea">
+                    <Form.Label>Your Review</Form.Label>
+                    <Form.Control
+                      as="textarea"
+                      rows={3}
+                      value={review}
+                      onChange={(e) => setReview(e.target.value)}
+                      required
+                    />
+                  </Form.Group>
+                  <Button variant="primary" type="submit" className="mt-3">
+                    Submit Review
+                  </Button>
+                </Form>
+              </Card.Body>
+            </Card>
+          )}
+          {reviews.length > 0 && (
+            <Card className="border-0 shadow-lg rounded overflow-hidden mt-4">
+              <Card.Body>
+                <Card.Title className="mb-4" style={{ fontSize: '1.5rem', textAlign: 'left' }}>Reviews</Card.Title>
+                {reviews.map((reviewObj, index) => (
+                  <Alert key={index} variant="secondary" className="text-left">
+                    {reviewObj.text} - <i>by {reviewObj.user.name.username}</i> on {new Date(reviewObj.created_at).toLocaleString()}
+                  </Alert>
+                ))}
+              </Card.Body>
+            </Card>
+          )}
         </Col>
       </Row>
     </Container>
-  )
-}
+  );
+};

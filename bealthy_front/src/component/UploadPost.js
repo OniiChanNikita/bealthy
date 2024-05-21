@@ -121,7 +121,7 @@ export const UploadPost = () => {
         });
         console.log(response.data);
         if (response){
-          window.location.href = 'post/'
+          window.location.href = '/'
         }
       } catch (e) {
         console.log('logout not working', e);

@@ -1,6 +1,6 @@
 import {BrowserRouter, Routes, Route} from 'react-router-dom'
 import {Login} from "./component/login";
-import {Home} from "./component/Home";
+import {Posts} from "./component/Posts";
 import {Navigation} from './component/navigation';
 import {Logout} from './component/logout';
 import {Signup} from './component/signup';
@@ -15,7 +15,8 @@ function App() {
         <Route path="/login" element={<Login/>}/>
         <Route path="/logout" element={<Logout/>}/>
         <Route path="/signup" element={<Signup/>}/>
-        <Route path="/post" element={<Home/>}/>
+
+        <Route path="/" element={<Posts/>}/>
         <Route exact={true} path="/post/:slug" element={<Post/>}/>
         <Route path="/upload_post" element={<UploadPost/>}/>
         <Route path='/profile/:slug'element={<Profile/>}/>

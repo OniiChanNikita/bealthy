@@ -9,12 +9,12 @@ export function Navigation() {
     if (localStorage.getItem('access_token') !== null) {
       setIsAuth(true);
     }
-  }, [isAuth]);
+  }, []);
   return ( 
     <div>    
       <Navbar bg="dark" variant="dark" >
         <Nav className="me-auto"> 
-        {isAuth ? <Nav.Link href="/post">Home</Nav.Link> : null}
+        {isAuth ? <Nav.Link href="/">Home</Nav.Link> : null}
         {isAuth ? <Nav.Link href="/upload_post">Upload Post</Nav.Link> : null}
         </Nav>
 
@@ -24,7 +24,7 @@ export function Navigation() {
         </Nav>
 
         <Nav>
-        {isAuth ? <Nav.Link href="/profile">{localStorage.getItem('username')}</Nav.Link> : null}
+        {isAuth ? <Nav.Link href={'/profile/'+localStorage.getItem('userData')+'/'}>{localStorage.getItem('username')}</Nav.Link> : null}
         </Nav>
       </Navbar>
      </div>

@@ -32,6 +32,7 @@ class Profile(models.Model):
 	def __str__(self):
 		return self.name.username
 
+
 class Research(models.Model): #исследования 
 	name = models.CharField(max_length = 255)
 	content = models.TextField()
@@ -47,6 +48,7 @@ class Image(models.Model):
 
 	def __str__(self):
  		return self.image.url
+
 
 class Post(models.Model):
 	TYPE_POSTS = (
@@ -70,5 +72,16 @@ class Post(models.Model):
 
 	def __str__(self):
 		return self.title
+
+class ReviewPost(models.Model):
+	post = models.ForeignKey(Post, related_name='reviews', on_delete=models.CASCADE)
+	user = models.ForeignKey(Profile, on_delete=models.CASCADE, blank=True)
+	text = models.CharField(max_length=255)
+
+	created_at = models.DateTimeField(auto_now_add=True)
+
+	def __str__(self):
+		return f'Review by {self.user.name.username} on {self.post.title}'
+
 
 

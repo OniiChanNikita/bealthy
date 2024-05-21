@@ -25,7 +25,9 @@ export const Signup = () => {
         },
       }
     );
-    console.log(resp.data.res)
+    localStorage.setItem('userData', resp.data.slug_profile);
+
+    console.log(resp.data.res, localStorage.getItem('userData'))
     if (resp.data.res === 'created'){
       const {data} = await axios.post(
         'http://localhost:8000/api/token/',

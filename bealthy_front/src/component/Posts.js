@@ -4,8 +4,7 @@ import axios from "axios";
 // Define the Login function.
 import { Container, Row, Col, Card, Form  } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-
-export const Home = () => {
+export const Posts = () => {
     const [filterType, setFilterType] = useState('');
     const [posts, setPosts] = useState({}); 
     const [filteredPosts, setFilteredPosts] = useState({});
@@ -82,7 +81,8 @@ export const Home = () => {
               <Card.Img variant="top" src={`http://localhost:8000${filteredPosts[key].main_image.image}`} style={{ height: '200px', objectFit: 'cover' }} />
               <Card.Body>
                 <Card.Title className="text-dark">{filteredPosts[key].title}</Card.Title>
-                <Card.Subtitle className="mb-2 text-muted">{filteredPosts[key].type_post}</Card.Subtitle>
+                <Card.Subtitle className="mb-3 text-muted">{filteredPosts[key].user.name.username}</Card.Subtitle>
+                <Card.Subtitle className="text-muted">{filteredPosts[key].type_post}</Card.Subtitle>
                 <Card.Text className="text-muted">{filteredPosts[key].content.substring(0, 25)+'...'}</Card.Text>
               </Card.Body>
             </Card>

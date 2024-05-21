@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, Form, Button } from 'react-bootstrap';
+import { Container, Row, Col, Card, Form, Button, Alert } from 'react-bootstrap';
 import { useLocation, Link } from 'react-router-dom';
 import axios from "axios";
 
@@ -30,7 +30,7 @@ export const Profile = () => {
 
         }]})
   const [filteredPosts, setFilteredPosts] = useState([]);
-
+  const [reviews, setReviews] = useState('');
 
   const currentUrl = useLocation().pathname;
   console.log(userData)
@@ -53,10 +53,20 @@ export const Profile = () => {
               },
             }
           );
-          console.log(data)
           setUserData(data)
           setFilteredPosts(data.posts)
-          console.log(filteredPosts)
+
+          const {data: reviewData} = await axios.get(
+            'http://localhost:8000'+currentUrl+'reviews/',
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('access_token')
+              },
+            }
+          );
+          setReviews(reviewData)
+          console.log(reviewData)
       })();
 
     };
@@ -94,14 +104,20 @@ export const Profile = () => {
               <Card.Text>
                 <strong>Subscriptions:</strong> {userData.profile.subscriptions}
               </Card.Text>
-              <div>
-                <strong>Reviews:</strong>
-                <ul className="list-unstyled">
-                  {profile_example.reviews.map((review, index) => (
-                    <li key={index} className="border-bottom py-2">{review}</li>
-                  ))}
-                </ul>
-              </div>
+              
+                  {reviews.length > 0 && (
+                    <Card className="border-0  rounded overflow-hidden mt-4">
+                      <Card.Body>
+                        <Card.Title className="mb-4" style={{ fontSize: '1.5rem', textAlign: 'left' }}>Reviews</Card.Title>
+                        {reviews.map((reviewObj, index) => (
+                          <Alert key={index} variant="secondary" className="text-left">
+                            {reviewObj.text} - <i>by {reviewObj.user.name.username}</i> on {new Date(reviewObj.created_at).toLocaleString()}
+                          </Alert>
+                        ))}
+                      </Card.Body>
+                    </Card>
+                  )}
+              
               <Button variant="primary" className="mt-3">Contact</Button>
             </Card.Body>
           </Card>
