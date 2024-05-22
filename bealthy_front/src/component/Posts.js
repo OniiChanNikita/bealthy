@@ -77,7 +77,7 @@ export const Posts = () => {
           <Col md={3} key={key} className="mb-4">
             <Link to={'/post/'+filteredPosts[key].slug_post+'/'} style={{ textDecoration: 'none', color: 'inherit' }}>
 
-            <Card className="border-0 shadow-sm h-100" style={{ backgroundColor: '#fff3cd' }}>
+            <Card className="border-0 shadow-sm h-100" /*style={{ backgroundColor: '#fff3cd' }}*/>
               <Card.Img variant="top" src={`http://localhost:8000${filteredPosts[key].main_image.image}`} style={{ height: '200px', objectFit: 'cover' }} />
               <Card.Body>
                 <Card.Title className="text-dark">{filteredPosts[key].title}</Card.Title>

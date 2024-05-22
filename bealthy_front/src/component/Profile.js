@@ -136,7 +136,7 @@ export const Profile = () => {
             {filteredPosts.slice(0, 6).map((post, index) => (
               <Col md={6} key={index} className="mb-4">
                 <Link to={'/post/'+post.slug_post+'/'} style={{ textDecoration: 'none', color: 'inherit' }}>
-                <Card className="border-0 shadow-sm h-100" style={{ backgroundColor: '#fff3cd' }}>
+                <Card className="border-0 shadow-sm h-100" /*style={{ backgroundColor: '#fff3cd' }}*/>
                   <Card.Img variant="top" src={`http://localhost:8000${post.main_image.image}`} style={{ height: '200px', objectFit: 'cover' }} />
                   <Card.Body>
                     <Card.Title className="text-dark">{post.title}</Card.Title>

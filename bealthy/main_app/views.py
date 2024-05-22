@@ -65,30 +65,33 @@ class CreateUserView(APIView):
 	authentication_classes = ()
 	def post(self, request):
 		print(request.data)
-		try:
+		if request.data.get('username') == None:
 			user = User.objects.create_user(username=request.data.get('username'), email=request.data.get('email'), password=request.data.get('password'))
 			user.save()
 			prof = Profile.objects.create(name = User.objects.get(username = request.data.get('username')), rating = 0, hidden_rating = 0, qualification = False, slug_profile = get_random_string(8, '0123456789'), description='', subscriptions=0)
 			prof.save()
 			print('work')
 			return Response(ProfileSerializer(prof, many=False).data)
-		except:
-			print('not work')
-			return Response({'res': 'not_created'})
+		else:
+			return Response({'error': 'username is exist'})
+	print('not work')
 
 
 
-@api_view(['GET', 'POST'])
-def getResearch(request):
+class GetResearch(APIView):
 	authentication_classes = [JWTAuthentication, ]
-	if request.method == 'GET':
+	permission_classes = [JWTAuthentication, ]
+
+	def get(self, request):
 		researches = Research.objects.all()
 		serializer = ResearchSerializer(researches, many=True)
-	if request.method == 'POST':
+		return Response(serializer.data)
+
+	def post(self, request):
 		serializer = ResearchSerializer(data=request.data)
 		if serializer.is_valid():
 			serializer.save()
-	return Response(serializer.data)
+		return Response(serializer.data)
 
 
 class getPosts(APIView):

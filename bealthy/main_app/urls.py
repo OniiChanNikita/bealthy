@@ -15,7 +15,7 @@ urlpatterns = [
     path('post/<slug:slug_post>/', views.getPost.as_view()),
     path('post/<slug:slug_post>/reviews/', views.reviewPostView.as_view()),
 
-    path('research/', views.getResearch),
+    path('research/', views.GetResearch.as_view()),
 
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     #path('api/custom-token/', CustomTokenObtainPairView.as_view(), name='custom_token_obtain_pair'),
