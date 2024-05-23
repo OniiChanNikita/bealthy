@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 import { GifReader } from 'omggif';
 
 
-export const Researches = () => {
+export const Exercises = () => {
     const [isHovered, setIsHovered] = useState(false);
     const [firstFrameUrls, setFirstFrameUrls] = useState({});
 
@@ -25,7 +25,7 @@ export const Researches = () => {
                 try {
                     const data = await axios.get('https://exercisedb.p.rapidapi.com/exercises',  {
                         params: {
-                            limit: '10',
+                            limit: '2',
                           },
                           headers: {
                             'X-RapidAPI-Key': '493ed86dd6msh68811499276d21bp1def8ejsn98e44127abce',
@@ -56,29 +56,39 @@ export const Researches = () => {
 
     const extractFirstFrames = (researches) => {
         researches.forEach(async (research) => {
-            const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
-            const response = await fetch(proxyUrl+research.gifUrl);
-            if (!response.ok) {
-                throw new Error(`Failed to fetch GIF: ${response.statusText}`);
-            }
-            const buffer = await response.arrayBuffer();
-            const byteArray = new Uint8Array(buffer);
+            console.log(research.gifUrl)
+            const url = research.gifUrl;
+            const parts = url.split('/');
+            const lastEndpoint = parts[parts.length - 1]; /*vKAWsPzehvwbAa*/
+            const response = await axios.get(`/research_image/${lastEndpoint}`, {responseType: "arraybuffer"});
+
+            const byteArray = new Uint8Array(response.data);
+            console.log(response.data, byteArray)
+
+            console.log(byteArray)
+
             const reader = new GifReader(byteArray);
 
-            const width = reader.width;
-            const height = reader.height;
-            const image = new Uint8ClampedArray(width * height * 4);
-            reader.decodeAndBlitFrameRGBA(0, image);
+            if (reader.numFrames() > 0) {
 
-            const canvas = document.createElement('canvas');
-            canvas.width = width;
-            canvas.height = height;
-            const ctx = canvas.getContext('2d');
-            const imageData = new ImageData(image, width, height);
-            ctx.putImageData(imageData, 0, 0);
+                const width = reader.width;
+                const height = reader.height;
+                const image = new Uint8ClampedArray(width * height * 4);
+                reader.decodeAndBlitFrameRGBA(0, image);
 
-            const firstFrameUrl = canvas.toDataURL();
-            setFirstFrameUrls(prev => ({ ...prev, [research.id]: firstFrameUrl }));
+                const canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                const imageData = new ImageData(image, width, height);
+                ctx.putImageData(imageData, 0, 0);
+
+                const firstFrameUrl = canvas.toDataURL();
+                setFirstFrameUrls(prev => ({ ...prev, [research.id]: firstFrameUrl }));
+            } else {
+                console.error('No frames in GIF:', research.gifUrl);
+            }
+        
         });
     };
 

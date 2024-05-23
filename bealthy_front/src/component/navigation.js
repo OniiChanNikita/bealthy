@@ -15,7 +15,7 @@ export function Navigation() {
       <Navbar bg="dark" variant="dark" >
         <Nav className="me-auto"> 
         {isAuth ? <Nav.Link href="/">Home</Nav.Link> : null}
-        {isAuth ? <Nav.Link href="/researches">Researches</Nav.Link> : null}
+        {isAuth ? <Nav.Link href="/exercises">Exercises</Nav.Link> : null}
         {isAuth ? <Nav.Link href="/upload_post">Upload Post</Nav.Link> : null}
         </Nav>
 
