@@ -25,7 +25,7 @@ export const Exercises = () => {
                 try {
                     const data = await axios.get('https://exercisedb.p.rapidapi.com/exercises',  {
                         params: {
-                            limit: '2',
+                            limit: '10',
                           },
                           headers: {
                             'X-RapidAPI-Key': '493ed86dd6msh68811499276d21bp1def8ejsn98e44127abce',
@@ -121,7 +121,7 @@ export const Exercises = () => {
       <Row>
         {Object.keys(filteredResearches).map(key => (
           <Col md={3} key={key} className="mb-4">
-            <Link to={'/post/'+filteredResearches[key].slug_post+'/'} style={{ textDecoration: 'none', color: 'inherit' }}>
+            <Link to={'/exercise/'+filteredResearches[key].id+'/'} style={{ textDecoration: 'none', color: 'inherit' }}>
 
             <Card onMouseEnter={() => handleMouseEnter(filteredResearches[key].id)} onMouseLeave={() => handleMouseLeave(filteredResearches[key].id)} className="border-0 shadow-sm h-100" /*style={{ backgroundColor: '#fff3cd' }}*/>
               <Card.Img

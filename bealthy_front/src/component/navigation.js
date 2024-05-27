@@ -16,6 +16,7 @@ export function Navigation() {
         <Nav className="me-auto"> 
         {isAuth ? <Nav.Link href="/">Home</Nav.Link> : null}
         {isAuth ? <Nav.Link href="/exercises">Exercises</Nav.Link> : null}
+        {isAuth ? <Nav.Link href="/pubmed">PubMed </Nav.Link> : null}
         {isAuth ? <Nav.Link href="/upload_post">Upload Post</Nav.Link> : null}
         </Nav>
 

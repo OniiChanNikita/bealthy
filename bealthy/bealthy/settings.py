@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
+    'channels',
+    #'channels_redis'
     #'ckeditor',
 ]
 
@@ -89,6 +91,18 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
+}
+
+ASGI_APPLICATION = 'bealthy.asgi.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        # 'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        # 'CONFIG': {
+        #     "hosts": [('127.0.0.1', 6379)],
+        # },
+        'BACKEND': "channels.layers.InMemoryChannelLayer",
+    },
 }
 
 

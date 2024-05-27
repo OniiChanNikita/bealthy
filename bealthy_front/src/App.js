@@ -1,4 +1,5 @@
 import {BrowserRouter, Routes, Route, useParams} from 'react-router-dom'
+import { useState, useEffect } from 'react'
 import {Login} from "./component/login";
 import {Posts} from "./component/Posts";
 import {Exercises} from "./component/Exercises";
@@ -9,26 +10,10 @@ import {Signup} from './component/signup';
 import {UploadPost} from './component/UploadPost';
 import {Post} from './component/Post';
 import {Profile} from './component/Profile';
-
-
-const exercises = [
-  {
-    bodyPart: "Chest",
-    equipment: "Barbell",
-    gifUrl: "https://example.com/exercise.gif",
-    id: "0001",
-    name: "Bench Press",
-    target: "Pectorals",
-    secondaryMuscles: ["Triceps", "Deltoids"],
-    instructions: [
-      "Lie on the bench with your feet flat on the ground.",
-      "Grip the barbell with hands slightly wider than shoulder-width apart.",
-      "Lower the barbell to your chest, then press it back up to the starting position."
-    ],
-    slug: "bench-press"
-  },
-  // Другие упражнения
-];
+import {PubMedSearch} from './component/PubMedSearch';
+import {StudyDetail} from './component/StudyDetail';
+import {MessageTest} from './component/MessageTest';
+import axios from 'axios'
 
 function App() {
   return <BrowserRouter>
@@ -39,25 +24,41 @@ function App() {
         <Route path="/signup" element={<Signup/>}/>
 
         <Route path="/" element={<Posts/>}/>
-        <Route path='/exercises/'element={<Exercises/>}/>
+
+        <Route path='/exercises'element={<Exercises/>}/>
         <Route path='/exercise/:slug'element={<ExerciseWrapper/>}/>
+        <Route path='/pubmed' element={<PubMedSearch />}/>
+        <Route path="/study/:id" element={<StudyDetail />} />
+
         <Route exact={true} path="/post/:slug" element={<Post/>}/>
         <Route path="/upload_post" element={<UploadPost/>}/>
         <Route path='/profile/:slug'element={<Profile/>}/>
 
+        <Route path="/chat" element={<MessageTest roomName='111'/>} />
       </Routes>
     </BrowserRouter>;
 }
 
 const ExerciseWrapper = () => {
   const { slug } = useParams();
-  const exercise = exercises.find(ex => ex.slug === slug);
+  const [exercise, setExercise] = useState(null)
+  useEffect(() => {
+    const loadExercise = async (s) => {
+      const {data: ex} = await axios.get(`https://exercisedb.p.rapidapi.com/exercises/exercise/${s}`,  {
+            headers: {
+              'X-RapidAPI-Key': '493ed86dd6msh68811499276d21bp1def8ejsn98e44127abce',
+              'X-RapidAPI-Host': 'exercisedb.p.rapidapi.com'
+            }
+      });
+      setExercise(ex)
+    }
+    loadExercise(slug)
 
-  if (!exercise) {
-    return <div>Exercise not found</div>;
+  }, [slug])
+  console.log(exercise)
+  if (exercise != null){
+    return <Exercise exercise={exercise} />;
   }
-
-  return <Exercise exercise={exercise} />;
 };
 
 export default App;

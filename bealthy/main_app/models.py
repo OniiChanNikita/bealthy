@@ -84,4 +84,11 @@ class ReviewPost(models.Model):
 		return f'Review by {self.user.name.username} on {self.post.title}'
 
 
+class Message(models.Model):
+    sender = models.ForeignKey(Profile, related_name='sent_messages', on_delete=models.CASCADE)
+    recipient = models.ForeignKey(Profile, related_name='received_messages', on_delete=models.CASCADE)
+    content = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return f'{self.sender} to {self.recipient}: {self.content[:20]}'

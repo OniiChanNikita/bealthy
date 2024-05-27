@@ -1,7 +1,12 @@
 import React from 'react';
 import { Card, Container, Row, Col, ListGroup } from 'react-bootstrap';
+import { useLocation } from 'react-router-dom';
+
 
 export const Exercise = ({ exercise }) => {
+  const currentUrl = useLocation().pathname;
+  console.log('ss')
+  console.log(currentUrl)
   return (
     <Container className="my-5" style={{ maxWidth: '90%' }}>
       <Row className="justify-content-center">
@@ -46,8 +51,7 @@ export const Exercise = ({ exercise }) => {
                   ))}
                 </ul>
               </Card.Text>
-              <hr />
-              <Card.Text className="font-weight-bold text-center mt-4 mb-3" style={{ fontSize: '1.5rem', color: '#007bff' }}>Get Started</Card.Text>
+              
             </Card.Body>
           </Card>
         </Col>

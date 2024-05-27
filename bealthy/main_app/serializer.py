@@ -19,7 +19,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 class ResearchSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Research
-		fields=('id', 'name','content')###############ID
+		fields=('id', 'name','content')###ID
 
 
 class ImageSerializer(serializers.ModelSerializer):
