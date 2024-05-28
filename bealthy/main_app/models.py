@@ -86,9 +86,9 @@ class ReviewPost(models.Model):
 
 class Message(models.Model):
     sender = models.ForeignKey(Profile, related_name='sent_messages', on_delete=models.CASCADE)
-    recipient = models.ForeignKey(Profile, related_name='received_messages', on_delete=models.CASCADE)
-    content = models.TextField()
+    receiver = models.ForeignKey(Profile, related_name='received_messages', on_delete=models.CASCADE)
+    text = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f'{self.sender} to {self.recipient}: {self.content[:20]}'
+        return f'{self.sender} to {self.receiver}: {self.text[:50]}'

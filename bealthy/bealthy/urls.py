@@ -20,7 +20,8 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('main_app.urls'))
+    path('', include('main_app.urls')),
+    path('api-auth/', include('rest_framework.urls')),
     #path('ckeditor/upload/', ckeditor_views.upload, name='ckeditor_upload'),
     #path('ckeditor/browse/', ckeditor_views.browse, name='ckeditor_browse'),
 ]

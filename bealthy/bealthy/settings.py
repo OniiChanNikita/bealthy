@@ -14,6 +14,7 @@ from pathlib import Path
 from os import path
 from datetime import timedelta
 
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -66,6 +67,8 @@ CORS_ALLOW_ALL_ORIGINS = True
 #     "http://localhost:3000"
 # ]
 
+ASGI_APPLICATION = 'bealthy.asgi.application'
+
 ROOT_URLCONF = 'bealthy.urls'
 
 TEMPLATES = [
@@ -93,15 +96,14 @@ REST_FRAMEWORK = {
     ),
 }
 
-ASGI_APPLICATION = 'bealthy.asgi.application'
 
 CHANNEL_LAYERS = {
     'default': {
-        # 'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        # 'CONFIG': {
-        #     "hosts": [('127.0.0.1', 6379)],
-        # },
-        'BACKEND': "channels.layers.InMemoryChannelLayer",
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+        # 'BACKEND': "channels.layers.InMemoryChannelLayer",
     },
 }
 

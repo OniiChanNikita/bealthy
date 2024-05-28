@@ -20,20 +20,9 @@ from .serializer import ProfileSerializer, ResearchSerializer, ImageSerializer, 
 from .models import Profile, Research, Image, Post, ReviewPost
 from django.contrib.auth.models import User
 
-
 from django.utils.crypto import get_random_string
 
 
-# class CustomTokenObtainPairView(TokenObtainPairView):
-# 	def post(self, request, *args, **kwargs):
-# 		serializer = self.get_serializer(data=request.data)
-# 		try:
-# 			serializer.is_valid(raise_exception=True)
-# 		except:
-# 			return Response({'detail': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
-
-# 		tokens = serializer.validated_data
-# 		return Response(tokens, status=status.HTTP_200_OK)
 class getUser(APIView):
 	permission_classes = [IsAuthenticated, ]
 	authentication_classes = [JWTAuthentication, ]
