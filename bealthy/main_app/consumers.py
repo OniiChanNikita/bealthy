@@ -71,8 +71,6 @@ class TextRoomConsumer(WebsocketConsumer):
                 'error': f"An error occurred: {str(e)}"
             }))
 
-
-
     def chat_message(self, event):
         # Receive message from room group
         text = event['message']

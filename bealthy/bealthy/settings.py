@@ -68,6 +68,7 @@ CORS_ALLOW_ALL_ORIGINS = True
 # ]
 
 ASGI_APPLICATION = 'bealthy.asgi.application'
+# daphne -p 8000 bealthy.asgi:application
 
 ROOT_URLCONF = 'bealthy.urls'
 
@@ -96,7 +97,7 @@ REST_FRAMEWORK = {
     ),
 }
 
-
+# docker run -p 6379:6379 -d redis:5
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',

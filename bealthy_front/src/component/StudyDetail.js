@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useParams, Link } from 'react-router-dom';
+import LoadingSpinner from './LoadingSpinner';
+
 
 export const StudyDetail = () => {
   const { id } = useParams();
@@ -24,7 +26,7 @@ export const StudyDetail = () => {
   }, [id]);
 
   if (!study) {
-    return <div>Loading...</div>;
+    return <LoadingSpinner />;
   }
 
   return (

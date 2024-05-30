@@ -4,49 +4,19 @@ import axios from "axios";
 // Define the Login function.
 import { Container, Row, Col, Card, Form  } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-export const Posts = () => {
+export const Posts = ({ data }) => {
+    console.log('wirst'.split(''))
+
+    console.log('wirst'.split('').includes('w'))
     const [filterType, setFilterType] = useState('');
-    const [posts, setPosts] = useState({}); 
-    const [filteredPosts, setFilteredPosts] = useState({});
-    useEffect(() => {    
-        if(localStorage.getItem('access_token') === null){                               
-            window.location.href = '/login'
-        }
-        else{         
-            (async () => {
-                try {
-                    const {data} = await axios.get('http://localhost:8000/post/', {
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': 'Bearer ' + localStorage.getItem('access_token')
-                        }
-                    });
-
-                    setPosts(data);
-                    setFilteredPosts(data);
-                    console.log(data);
-                    console.log(posts[0])       
-
-
-                    /*for (const property in data) {
-                        image_name[localStorage.getItem('username')+'.'+data[property].content] = data[property].image
-                    }
-                    console.log(image_name);*/
-
-                    /*const {data: {image_path}} = await axios.post('http://localhost:8000/image/', image_name, {
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': 'Bearer ' + localStorage.getItem('access_token')
-                        }
-                    });*/
-
-                    /*console.log(image_path);*/
-                } catch (error) {
-                    console.error('Error:', error);
-                }
-            })();
-        };
-    }, []); 
+    const [posts, setPosts] = useState(data); 
+    const [filteredPosts, setFilteredPosts] = useState(data);
+    /*useEffect(() => {    
+        setPosts();
+        setFilteredPosts(data);
+        console.log(data);
+        console.log(posts[0])  
+    }, [posts]); */
     useEffect(() => {
     if (filterType) {
         setFilteredPosts(posts.filter(post => post.type_post === filterType));

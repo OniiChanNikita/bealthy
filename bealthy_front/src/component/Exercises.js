@@ -6,53 +6,48 @@ import { Container, Row, Col, Card, Form  } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { GifReader } from 'omggif';
 
-
-export const Exercises = () => {
+const res_example = [
+  {
+    "bodyPart": "string",
+    "equipment": "string",
+    "gifUrl": "string",
+    "id": "string",
+    "name": "string",
+    "target": "string",
+    "secondaryMuscles": [
+      "string"
+    ],
+    "instructions": [
+      "string"
+    ]
+  }
+]
+export const Exercises = ({data}) => {
     const [isHovered, setIsHovered] = useState(false);
     const [firstFrameUrls, setFirstFrameUrls] = useState({});
 
     const [filterType, setFilterType] = useState('');
-    const [researches, setResearches] = useState({}); 
-    const [filteredResearches, setFilteredResearches] = useState({});
+    const [researches, setResearches] = useState(data.data); 
+    const [filteredResearches, setFilteredResearches] = useState(data.data);
+
+    const [bodyPart, setBodyPart] = useState('');
 
 
-    useEffect(() => {    
-        if(localStorage.getItem('access_token') === null){                               
-            window.location.href = '/login'
-        }
-        else{         
-            (async () => {
-                try {
-                    const data = await axios.get('https://exercisedb.p.rapidapi.com/exercises',  {
-                        params: {
-                            limit: '10',
-                          },
-                          headers: {
-                            'X-RapidAPI-Key': '493ed86dd6msh68811499276d21bp1def8ejsn98e44127abce',
-                            'X-RapidAPI-Host': 'exercisedb.p.rapidapi.com'
-                          }
-                    });
-                    setResearches(data.data);
-                    console.log(data)
+    useEffect(() => {         
+        extractFirstFrames(researches);
 
-                    setFilteredResearches(data.data);
-                    extractFirstFrames(data.data);
-
-                } catch (error) {
-                    console.error('Error:', error);
-                }
-            })()
-        };
-    }, [filterType]); 
+    }, [researches]); 
     
     useEffect(() => {
-    if (filterType) {
-        /*setFilteredResearches(researches.filter(research => research.type_post === filterType));*/
+
+    if (bodyPart!='') {
+        console.log(researches.filter(research => research.bodyPart.includes(bodyPart) === true))
+        setFilteredResearches(researches.filter(research => research.bodyPart.includes(bodyPart) === true));
         console.log(filteredResearches)
     } else {
-      setFilteredResearches(researches);
+        setFilteredResearches(researches);
     }
-    }, [filterType]);    
+    }, [bodyPart]);    
 
     const extractFirstFrames = (researches) => {
         researches.forEach(async (research) => {
@@ -101,6 +96,8 @@ export const Exercises = () => {
         setIsHovered(prev => ({ ...prev, [id]: false }));
     };
 
+    const handleSearchBodyPart = (e) => setBodyPart(e.target.value);
+
     return <div >
         <div className="d-flex justify-content-center flex-column align-items-center"> 
     { researches[0] == undefined ? <p style={{width: '100%', margin: '5% 0 25px 0'}} className="text-center h3">У вас нету публикаций, хотите создать новую?</p> : null}
@@ -110,13 +107,7 @@ export const Exercises = () => {
     <Row>   
     <Col>
       <Form.Group controlId="postTypeFilter" className="mb-4">
-        <Form.Label className="text-info">Filter by Research Type</Form.Label>
-        <Form.Control as="select" value={filterType} onChange={e => setFilterType(e.target.value)}>
-          <option value="">All</option>
-          <option value="traning">Training Program</option>
-          <option value="nutrion">Nutrition Program</option>
-          <option value="product">Products Recommended</option>
-        </Form.Control>
+        <Form.Control value={bodyPart} onChange = {handleSearchBodyPart}  placeholder="Body Part..." style={{ borderBottom: '2px solid #8b8b8b' }} />
       </Form.Group>
       <Row>
         {Object.keys(filteredResearches).map(key => (

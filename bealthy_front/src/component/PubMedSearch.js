@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom'
+import LoadingSpinner from './LoadingSpinner';
+
 
 export const PubMedSearch = () => {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
+  const [searched, setSearches] = useState(false);
 
   const handleSearch = async (e) => {
     e.preventDefault();
@@ -25,7 +28,33 @@ export const PubMedSearch = () => {
       console.error('Error fetching data from PubMed:', error);
     }
   };
-
+  const handleChange = () => {
+    setSearches(true)
+  }
+  if (results.length < 1 && searched==true ){
+    return (
+      <div className="d-flex justify-content-center align-items-center flex-column">
+      <div className="text-center mb-4">
+        <h1 className="mb-4">PubMed Search</h1>
+        <form onSubmit={handleSearch}>
+          <div className="mb-3">
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Enter search term"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
+          </div>
+          <button type="submit" onClick={(e) => handleChange()} className="btn btn-primary">Search</button>
+        </form>
+      </div>
+      <div className="">
+      <LoadingSpinner />;
+      </div>
+    </div>
+    )
+  }
   return (
     <div className="d-flex justify-content-center align-items-center flex-column">
       <div className="text-center mb-4">
@@ -40,7 +69,7 @@ export const PubMedSearch = () => {
               onChange={(e) => setQuery(e.target.value)}
             />
           </div>
-          <button type="submit" className="btn btn-primary">Search</button>
+          <button type="submit" onClick={(e) => handleChange()} className="btn btn-primary">Search</button>
         </form>
       </div>
       <div className="mt-4 w-75">
@@ -56,9 +85,7 @@ export const PubMedSearch = () => {
               </div>
             ))}
           </div>
-        ) : (
-          <p>No results found</p>
-        )}
+        ) : null}
       </div>
     </div>
   );

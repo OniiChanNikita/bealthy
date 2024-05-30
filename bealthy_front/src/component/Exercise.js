@@ -1,14 +1,14 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { Card, Container, Row, Col, ListGroup } from 'react-bootstrap';
 import { useLocation } from 'react-router-dom';
 
 
 export const Exercise = ({ exercise }) => {
   const currentUrl = useLocation().pathname;
-  console.log('ss')
-  console.log(currentUrl)
+  console.log(exercise)
   return (
-    <Container className="my-5" style={{ maxWidth: '90%' }}>
+  <Container className="my-5" style={{ maxWidth: '90%' }}>
+  {exercise != {} ? (
       <Row className="justify-content-center">
         <Col md={12}>
           <Card className="border-0 shadow-lg rounded overflow-hidden">
@@ -56,7 +56,10 @@ export const Exercise = ({ exercise }) => {
           </Card>
         </Col>
       </Row>
+    ): null}
     </Container>
+    
+    
   );
 };
 

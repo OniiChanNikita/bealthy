@@ -69,7 +69,7 @@ class CreateUserView(APIView):
 
 class GetResearch(APIView):
 	authentication_classes = [JWTAuthentication, ]
-	permission_classes = [JWTAuthentication, ]
+	permission_classes = [IsAuthenticated, ]
 
 	def get(self, request):
 		researches = Research.objects.all()

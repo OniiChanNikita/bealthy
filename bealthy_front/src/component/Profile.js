@@ -3,8 +3,7 @@ import { Container, Row, Col, Card, Form, Button, Alert } from 'react-bootstrap'
 import { useLocation, Link } from 'react-router-dom';
 import axios from "axios";
 
-// Mock Data
-const profile_example = {
+/*const profile_example = {
   name: 'John Doe',
   rating: 4.5,
   qualification: 'yes',
@@ -18,59 +17,31 @@ const profile_example = {
   ],
   subscriptions: 1200,
 };
+{profile:
+  {name: {username: '', date_joined: ''}, rating: 0, qualification: null, description: '', subscriptions: 0, image_profile: ''
+}, posts: [
+  {user: {name: {}}, main_image: {}, image: [{}], title: '', type_post: '', content: '', research: [{}]
+}]}
+*/
 
 
-
-export const Profile = () => {
+export const Profile = ({data}) => {
   const [filterType, setFilterType] = useState('');
-  const [userData, setUserData] = useState({profile:
-          {name: {username: '', date_joined: ''}, rating: 0, qualification: null, description: '', subscriptions: 0, image_profile: ''
-        }, posts: [
-          {user: {name: {}}, main_image: {}, image: [{}], title: '', type_post: '', content: '', research: [{}]
-
-        }]})
-  const [filteredPosts, setFilteredPosts] = useState([]);
-  const [reviews, setReviews] = useState('');
+  console.log(data)
+  const [userData, setUserData] = useState(data.data)
+  const [filteredPosts, setFilteredPosts] = useState(data.data.posts);
+  const [reviews, setReviews] = useState(data.reviewData);
 
   const currentUrl = useLocation().pathname;
   console.log(userData)
 
   console.log(currentUrl)
   useEffect(() => {
-    if(localStorage.getItem('access_token') === null){                               
-      window.location.href = '/login'
-
-    }
-    else{
-      (async () => {
-          console.log('http://localhost:8000'+currentUrl)
-          const {data} = await axios.get(
-            'http://localhost:8000'+currentUrl,
-            {
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + localStorage.getItem('access_token')
-              },
-            }
-          );
-          setUserData(data)
-          setFilteredPosts(data.posts)
-
-          const {data: reviewData} = await axios.get(
-            'http://localhost:8000'+currentUrl+'reviews/',
-            {
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + localStorage.getItem('access_token')
-              },
-            }
-          );
-          setReviews(reviewData)
-          console.log(reviewData)
-      })();
-
-    };
-  }, []);
+    
+    setUserData(data.data)
+    setFilteredPosts(data.data.posts)    
+    setReviews(data.reviewData)
+  }, [reviews, userData, filteredPosts]);
 
   useEffect(() => {
 
