@@ -1,12 +1,14 @@
 # consumers.py
 import json
 from asgiref.sync import async_to_sync
-from channels.generic.websocket import WebsocketConsumer
-from .models import Message, Profile
+from channels.generic.websocket import AsyncWebsocketConsumer
+from .models import Message, Profile, Conversation
 from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+from channels.db import database_sync_to_async
 
-class TextRoomConsumer(WebsocketConsumer):
-    def connect(self):
+class TextRoomConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
         self.room_name = self.scope['url_route']['kwargs']['room_name']
         self.room_group_name = f'chat_{self.room_name}'
 
@@ -17,39 +19,29 @@ class TextRoomConsumer(WebsocketConsumer):
         )
         self.accept()
 
-    def disconnect(self, close_code):
+    async def disconnect(self, close_code):
         # Leave room group
         async_to_sync(self.channel_layer.group_discard)(
             self.room_group_name,
             self.channel_name
         )
 
-    def receive(self, text_data):
+    async def receive(self, text_data):
         try:
             # Получаем данные из WebSocket сообщения
             text_data_json = json.loads(text_data)
-            text = text_data_json['text']
-            sender = text_data_json['sender']
-            receiver = text_data_json['receiver']
+            message = text_data_json['message']
+            user_id = self.scope['user'].id
+
+            await self.save_message(self.conversation_id, user_id, message)
             
             # Получение профиля пользователя
-            sender_profile = Profile.objects.get(name=User.objects.get(username=sender))
-            receiver_profile = Profile.objects.get(name=User.objects.get(username=receiver))
-
-
-            # Сохранение сообщения в базе данных
-            message = Message(sender=sender_profile, receiver=receiver_profile, text=text)
-            print(message.sender, message.receiver)
-            message.save()
-
-            # Отправка сообщения в группу
-            async_to_sync(self.channel_layer.group_send)(
-                self.room_group_name,
+            await self.channel_layer.group_send(
+            self.conversation_group_name,
                 {
                     'type': 'chat_message',
-                    'message': text,
-                    'sender': sender,
-                    'receiver': receiver
+                    'message': message,
+                    'user_id': user_id
                 }
             )
         except User.DoesNotExist as e:
@@ -71,15 +63,21 @@ class TextRoomConsumer(WebsocketConsumer):
                 'error': f"An error occurred: {str(e)}"
             }))
 
-    def chat_message(self, event):
+    async def chat_message(self, event):
         # Receive message from room group
-        text = event['message']
-        sender = event['sender']
-        receiver = event['receiver']
+        message = event['message']
+        user_id = event['user_id']
+        user = await self.get_user(user_id)
 
         # Send message to WebSocket
-        self.send(text_data=json.dumps({
-            'text': text,
-            'sender': sender,
-            'receiver': receiver
+        await self.send(text_data=json.dumps({
+            'message': message,
+            'username': user.username
         }))
+
+    @database_sync_to_async
+    def save_message(self, conversation_id, user_id, message):
+        conversation = Conversation.objects.get(id=conversation_id)
+        sender = Profile.objects.get(name = User.objects.get(id=user_id))
+        return Message.objects.create(conversation=conversation, sender=sender, content=message)
+

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Profile, Research, Image, Post, ReviewPost
+from .models import Profile, Research, Image, Post, ReviewPost, Participant, Conversation
 from django.contrib.auth.models import User
 
 
@@ -17,9 +17,10 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 
 class ResearchSerializer(serializers.ModelSerializer):
+	user = ProfileSerializer(many=False, read_only=True)
 	class Meta:
 		model = Research
-		fields=('id', 'name','content')###ID
+		fields=['user', 'id_research', 'name','datetime']###ID
 
 
 class ImageSerializer(serializers.ModelSerializer):
@@ -44,3 +45,18 @@ class ReviewPostSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = ReviewPost
 		fields=['post', 'user', 'text', 'created_at']
+
+
+class ConversationSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = Conversation
+		fields = ['created_at']
+
+
+class ParticipantSerializer(serializers.ModelSerializer):
+	conversation = ConversationSerializer(many=False, read_only=True) 
+	user = ProfileSerializer(many=False, read_only=True)
+	class Meta:
+		model = Participant
+		fields = ['conversation', 'user', 'id']
+

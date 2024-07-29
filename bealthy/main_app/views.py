@@ -15,9 +15,9 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-from .serializer import ProfileSerializer, ResearchSerializer, ImageSerializer, PostSerializer, CurrentUserSerializer, ReviewPostSerializer
+from .serializer import ProfileSerializer, ResearchSerializer, ImageSerializer, PostSerializer, CurrentUserSerializer, ReviewPostSerializer, ParticipantSerializer
 
-from .models import Profile, Research, Image, Post, ReviewPost
+from .models import Profile, Research, Image, Post, ReviewPost, Conversation, Participant
 from django.contrib.auth.models import User
 
 from django.utils.crypto import get_random_string
@@ -77,15 +77,22 @@ class GetResearch(APIView):
 		return Response(serializer.data)
 
 	def post(self, request):
-		serializer = ResearchSerializer(data=request.data)
-		if serializer.is_valid():
-			serializer.save()
-		return Response(serializer.data)
+		print('-------------------------------')
+		if request.data:
+			try:
+				research = Research.objects.create(user = Profile.objects.get(name=request.user), name = request.data["name"], id_research = request.data["id_research"])
+				research.save()
+				#serializer = ResearchSerializer(data={"id_research": request.data["id_research"], "name": request.data["name"], "usern": Profile.objects.get(name=request.user)})
+			except:
+				print('already added')
+		serializer = ResearchSerializer(Research.objects.filter(user = Profile.objects.get(name=request.user)), many=True).data
+		return Response(serializer)
+
 
 
 class getPosts(APIView):
-	permission_classes = [IsAuthenticated, ]
-	authentication_classes = [JWTAuthentication, ]
+	permission_classes = [ ]
+	authentication_classes = [ ]
 
 	def post(self, request):
 		print(request.data)
@@ -133,25 +140,6 @@ class getPost(APIView):
 		get_object_post = get_object_or_404(Post, slug_post=slug_post)
 		return Response(PostSerializer(get_object_post, many=False).data)
 
-
-class getProfile(APIView):
-	permission_classes = [IsAuthenticated, ]
-	authentication_classes = [JWTAuthentication, ]
-
-	def get(self, request, slug_profile): 
-		get_object_profile = get_object_or_404(Profile, slug_profile=slug_profile)
-		posts = Post.objects.filter(user = get_object_profile)
-		if request.user == get_object_profile.name:
-			print(get_object_profile, posts)
-			combined_data = {
-				'profile': ProfileSerializer(get_object_profile, many=False).data,
-				'posts': PostSerializer(posts, many=True).data
-			}
-			return Response(combined_data)
-		else:
-			return Response()
-
-
 class reviewPostView(APIView):
 	permission_classes = [IsAuthenticated, ]
 	authentication_classes = [JWTAuthentication, ]
@@ -170,6 +158,27 @@ class reviewPostView(APIView):
 		return Response(ReviewPostSerializer(review, many=False).data)
 
 
+class getProfile(APIView):
+	authentication_classes = [JWTAuthentication, ]
+
+	def get(self, request, slug_profile): 
+		get_object_profile = get_object_or_404(Profile, slug_profile=slug_profile)
+		posts = Post.objects.filter(user = get_object_profile)
+		print(get_object_profile, posts)
+		combined_data = {
+			'profile': ProfileSerializer(get_object_profile, many=False).data,
+			'posts': PostSerializer(posts, many=True).data
+		}
+		return Response(combined_data)
+
+class getProfiles(APIView):
+	authentication_classes = []
+	permission_classes = []
+
+	def get(self, request):
+		return Response(ProfileSerializer(Profile.objects.all(), many=True).data)
+
+
 class reviewProfileView(APIView):
 	permission_classes = [IsAuthenticated, ]
 	authentication_classes = [JWTAuthentication, ]
@@ -183,3 +192,62 @@ class reviewProfileView(APIView):
 			print(user_posts, sorted_reviews)
 			return Response(ReviewPostSerializer(sorted_reviews, many=True).data)
 		return Response({'reviews': None})
+
+
+
+class researchProfileView(APIView):
+	permission_classes = [IsAuthenticated, ]
+	authentication_classes = [JWTAuthentication, ]
+
+	def get(self, request, slug_profile):
+		get_object_profile = get_object_or_404(Profile, slug_profile=slug_profile)
+
+		user_researches = Research.objects.filter(user=get_object_profile)
+		print(user_researches.first())
+
+		if user_researches:
+			return Response(ResearchSerializer(user_researches, many=True).data)
+		return Response({'reviews': None})
+
+	
+
+class createParticipant(APIView):
+	permission_classes = [IsAuthenticated, ]
+	authentication_classes = [JWTAuthentication, ]
+
+	def post(self, request):
+		boolCheck = (set(
+				[partic.conversation for partic in Participant.objects.filter(user = Profile.objects.get(name = User.objects.get(username = request.data["user1"])))]
+			).isdisjoint(set(
+				[partic.conversation for partic in Participant.objects.filter(user = Profile.objects.get(name = User.objects.get(username = request.data["user2"])))]
+			))
+		)
+		if boolCheck == True:
+			conv = Conversation.objects.create()
+			user1 = Participant.objects.create(conversation = conv, user = Profile.objects.get(name = User.objects.get(username = request.data["user1"])))		
+			user1 = Participant.objects.create(conversation = conv, user = Profile.objects.get(name = User.objects.get(username = request.data["user2"])))
+			return Response({'status': 'created'})
+		elif boolCheck == False:
+			return Response({'status': 'already created'})
+
+class getParticipant(APIView):
+	permission_classes = [IsAuthenticated, ]
+	authentication_classes = [JWTAuthentication, ]
+
+	def get(self, request):
+		chats = []
+
+		chat_participants = Participant.objects.filter(user=Profile.objects.get(name = request.user))
+
+		for chat_participant in chat_participants:
+			chats.append(chat_participant.conversation)
+
+		users = Participant.objects.filter(conversation__in=chats).exclude(user=Profile.objects.get(name = request.user))
+		print(users)
+		return Response(ParticipantSerializer(users, many=True).data)
+
+
+
+
+		
+

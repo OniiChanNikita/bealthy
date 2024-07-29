@@ -10,27 +10,25 @@ import {Signup} from './component/signup';
 import {UploadPost} from './component/UploadPost';
 import {Post} from './component/Post';
 import {Profile} from './component/Profile';
+import {Profiles} from './component/Profiles';
 import {PubMedSearch} from './component/PubMedSearch';
 import {StudyDetail} from './component/StudyDetail';
 import {MessageTest} from './component/MessageTest';
+import {MessageUsersBox} from './component/MessageUsersBox';
+import {MessageBox} from './component/MessageBox';
+import {UploadResearch} from './component/UploadResearch';
 import withLoading from './component/withLoading';
 import withLoadingProfile from './component/withLoadingProfile';
 import NotFoundPage from './component/NotFoundPage';
 import axios from 'axios'
 
 const fetchPosts = async () => {
-  if(localStorage.getItem('access_token') === null){                               
-      window.location.href = '/login'
-  }
-  else{
-    const response = await axios.get('http://localhost:8000/post/', {
-      headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + localStorage.getItem('access_token')
-      }
-    })
-    return response.data
-  }
+  const response = await axios.get('http://localhost:8000/post/', {
+    headers: {
+        'Content-Type': 'application/json',
+    }
+  })
+  return response.data
 };
 
 const fetchExercises = async () => {
@@ -51,7 +49,7 @@ const fetchExercises = async () => {
   }
 };
 
-const fetchProfile = async (slug) => {
+/*const fetchProfile = async (slug) => {
   if(localStorage.getItem('access_token') === null){                               
       window.location.href = '/login'
   }
@@ -78,16 +76,16 @@ const fetchProfile = async (slug) => {
     return {data, reviewData}
   }
   
-};
+};*/
 
 const PostsWithLoading = withLoading(Posts, fetchPosts);
 const ExercisesWithLoading = withLoading(Exercises, fetchExercises);
-const ProfileWithLoading = withLoadingProfile(Profile, fetchProfile);
+//const ProfileWithLoading = withLoadingProfile(Profile, fetchProfile);
 
-const WrappedComponentWithSlug = () => {
+/*const WrappedComponentWithSlug = () => {
   const { slug } = useParams(); // Получаем slug из параметров маршрута
   return <ProfileWithLoading slug={slug} />;
-};
+};*/
 
 function App() {
   return <BrowserRouter>
@@ -99,6 +97,8 @@ function App() {
 
         <Route path="/" element={<PostsWithLoading />}/>
 
+        <Route path="/upload_research/:id/:slug" element={<UploadResearch/>}/>
+
         <Route path='/exercises'element={<ExercisesWithLoading/>}/>
         <Route path='/exercise/:slug'element={<ExerciseWrapper/>}/>
         <Route path='/pubmed' element={<PubMedSearch />}/>
@@ -106,9 +106,11 @@ function App() {
 
         <Route exact={true} path="/post/:slug" element={<Post/>}/>
         <Route path="/upload_post" element={<UploadPost/>}/>
-        <Route path='/profile/:slug' element={<WrappedComponentWithSlug/>}/>
+        <Route path='/profile/:slug' element={<Profile/>}/>
+        <Route path='/profiles/' element={<Profiles/>}/>
 
         <Route path="/chat" element={<MessageTest/>} />
+        <Route path="/message" element={<MessageUsersBox/>} />
 
         <Route path="*" element={<NotFoundPage />} />
       </Routes>

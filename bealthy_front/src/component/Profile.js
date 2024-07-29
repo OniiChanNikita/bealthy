@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Form, Button, Alert } from 'react-bootstrap';
-import { useLocation, Link } from 'react-router-dom';
+import { useLocation, Link, useParams } from 'react-router-dom';
+import LoadingSpinner from './LoadingSpinner';
 import axios from "axios";
+
+
 
 /*const profile_example = {
   name: 'John Doe',
@@ -25,55 +28,137 @@ import axios from "axios";
 */
 
 
-export const Profile = ({data}) => {
-  const [filterType, setFilterType] = useState('');
-  console.log(data)
-  const [userData, setUserData] = useState(data.data)
-  const [filteredPosts, setFilteredPosts] = useState(data.data.posts);
-  const [reviews, setReviews] = useState(data.reviewData);
+export const Profile = () => {
+  console.log(localStorage.getItem('access_token'))
+  if(localStorage.getItem('access_token') === null){                               
+      window.location.href = '/login'
+  }
+  const slug = useParams()
 
-  const currentUrl = useLocation().pathname;
+  const [filterType, setFilterType] = useState('');
+  const [userDataProfile, setUserDataProfile] = useState()//data.data
+  const [filteredPosts, setFilteredPosts] = useState();//data.data.posts
+  const [reviews, setReviews] = useState();//data.reviewData
+  const [research, setResearch] = useState()
+  const [switchResearch, setSwitchResearch] = useState(false)
+  const [itsYour, setItsYour] = useState(false)
+
+
+  /*const currentUrl = useLocation().pathname;
   console.log(userData)
 
-  console.log(currentUrl)
+  console.log(currentUrl)*/
+
   useEffect(() => {
+    const fetchData = async () => {
+
+      const {data} = await axios.get(
+        'http://localhost:8000/profile/'+slug.slug,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + localStorage.getItem('access_token')
+          },
+        }
+      );
+
+      setUserDataProfile(data)
+      setFilteredPosts(data.posts)
+      if (localStorage.getItem('userData') == data.profile.slug_profile){
+        setItsYour(true)
+        console.log('its your account')
+      }
+
+    }
+    fetchData();
+  }, [])
+  useEffect(() => {
+    const fetchData = async () => {
+      const {data: reviewData} = await axios.get(
+        'http://localhost:8000/profile/'+slug.slug+'/reviews/',
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + localStorage.getItem('access_token')
+          },
+        }
+      );
+      setReviews(reviewData)
+
+    }
+    fetchData()
+  }, [])
+  useEffect(() => {
+    const fetchData = async () => {
+      const {data: researchData} = await axios.get(
+        'http://localhost:8000/profile/'+slug.slug+'/researches/',
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + localStorage.getItem('access_token')
+          },
+        }
+      );
+      setResearch(researchData)
+    }
+    fetchData()
+  }, [])
+
     
-    setUserData(data.data)
-    setFilteredPosts(data.data.posts)    
-    setReviews(data.reviewData)
-  }, [reviews, userData, filteredPosts]);
-
   useEffect(() => {
-
     if (filterType) {
-      setFilteredPosts(userData.posts.filter(post => post.type_post === filterType));
+      setFilteredPosts(userDataProfile.posts.filter(post => post.type_post === filterType));
     } else {
-      setFilteredPosts(userData.posts);
+      if (userDataProfile){
+        setFilteredPosts(userDataProfile.posts);
+      }
     }
   }, [filterType]);
+
+  const funcSwitchResearch = () => {
+    setSwitchResearch(!switchResearch);
+    console.log(switchResearch)
+  }
+
+  const funcCreateConversationAndParticipant = async () =>{
+    const response = await axios.post('http://localhost:8000/createParticipant/', {"user1": localStorage.getItem('username'), "user2": userDataProfile.profile.name.username},
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + localStorage.getItem('access_token')
+        },
+      }
+    );
+    console.log(response)
+    window.location.href = '/message'
+  }
+
+  if (!userDataProfile || !filteredPosts || !reviews || !research) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <Container className="my-5">
       <Row>
         <Col md={4}>
           <Card className="border-0 shadow-sm mb-4" style={{ backgroundColor: '#f8f9fa' }}>
-            <Card.Img variant="top" src={`http://localhost:8000${userData.profile.image_profile}`} />
+            <Card.Img variant="top" src={`http://localhost:8000${userDataProfile.profile.image_profile}`} />
             <Card.Body>
-              <Card.Title className="text-primary">{userData.profile.name.username}</Card.Title>
+              <Card.Title className="text-primary">{userDataProfile.profile.name.username}</Card.Title>
               <Card.Text>
-                <strong>Rating:</strong> <span className="text-success">{userData.profile.rating} / 5</span>
+                <strong>Rating:</strong> <span className="text-success">{userDataProfile.profile.rating} / 5</span>
               </Card.Text>
               <Card.Text>
-                <strong>Qualification:</strong> {userData.profile.qualification ? 'Qualified' : 'Not Qualified'}
+                <strong>Qualification:</strong> {userDataProfile.profile.qualification ? 'Qualified' : 'Not Qualified'}
               </Card.Text>
               <Card.Text>
-                <strong>Description:</strong> {userData.profile.description}
+                <strong>Description:</strong> {userDataProfile.profile.description}
               </Card.Text>
               <Card.Text>
-                <strong>Date Joined:</strong> {userData.profile.name.date_joined.substring(0, 10)}
+                <strong>Date Joined:</strong> {userDataProfile.profile.name.date_joined.substring(0, 10)}
               </Card.Text>
               <Card.Text>
-                <strong>Subscriptions:</strong> {userData.profile.subscriptions}
+                <strong>Subscriptions:</strong> {userDataProfile.profile.subscriptions}
               </Card.Text>
               
                   {reviews.length > 0 && (
@@ -89,20 +174,25 @@ export const Profile = ({data}) => {
                     </Card>
                   )}
               
-              <Button variant="primary" className="mt-3">Contact</Button>
+              {!itsYour && <Button onClick={funcCreateConversationAndParticipant} to="/chat" className="btn btn-secondary mt-3">Contact</Button>  }
             </Card.Body>
           </Card>
         </Col>
         <Col md={8}>
-          <Form.Group controlId="postTypeFilter" className="mb-4">
-            <Form.Label className="text-info">Filter by Post Type</Form.Label>
-            <Form.Control as="select" value={filterType} onChange={e => setFilterType(e.target.value)}>
-              <option value="">All</option>
-              <option value="traning">Training Program</option>
-              <option value="nutrion">Nutrition Program</option>
-              <option value="product">Products Recommended</option>
-            </Form.Control>
-          </Form.Group>
+          <Row>
+            <Form.Group controlId="postTypeFilter" className="mb-4" style={{width: '50%'}}>
+              <Form.Control as="select" value={filterType} onChange={e => setFilterType(e.target.value)} style={{borderRadius: '100px', textAlign: 'center'}} >
+                <option value="">All</option>
+                <option value="traning">Training Program</option>
+                <option value="nutrion">Nutrition Program</option>
+                <option value="product">Products Recommended</option>
+              </Form.Control>
+
+            </Form.Group>
+            <Button className='btn btn-light mb-4' onClick={funcSwitchResearch} style={{width: '50%', borderRadius: '100px', textAlign: 'center', border: '1px solid #dee2e6', backgroundColor: 'transparent '}}>Research</Button>
+          </Row>
+          {!switchResearch &&
+
           <Row>
             {filteredPosts.slice(0, 6).map((post, index) => (
               <Col md={6} key={index} className="mb-4">
@@ -119,6 +209,41 @@ export const Profile = ({data}) => {
               </Col>
             ))}
           </Row>
+          }
+          {switchResearch &&
+          <Row>
+            {research.slice(0, 6).map((research, index) => (
+              <Col md={6} key={index} className="mb-4 position-relative">
+                <Link to={'/study/' + research.id + '/'} style={{ textDecoration: 'none', color: 'inherit' }}>
+                  <Card className="border-0 shadow-sm h-100 research-card m-1">
+                    <Card.Body>
+                      <Card.Title className="text-dark">{research.name}</Card.Title>
+                      <Card.Text className="text-muted">{research.text}</Card.Text>
+                    </Card.Body>
+                    <button
+                      variant="danger"
+                      className="btn btn-outline-danger"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        //handleDelete(research.id);
+                      }}
+                      style={{
+                        margin: '0px',
+                        position: 'absolute',
+                        bottom: '5px',
+                        right: '5px',
+                        display: 'block',
+                      }}
+                    >
+                      Delete
+                    </button>
+                  </Card>
+                </Link>
+              </Col>
+            ))}
+          </Row>
+          }
+
         </Col>
       </Row>
     </Container>

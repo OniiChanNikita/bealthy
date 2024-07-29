@@ -10,6 +10,7 @@ urlpatterns = [
     path('', views.Home.as_view()),
     path('profile/<slug:slug_profile>/', views.getProfile.as_view()),
     path('profile/<slug:slug_profile>/reviews/', views.reviewProfileView.as_view()),
+    path('profile/<slug:slug_profile>/researches/', views.researchProfileView.as_view()),
 
     path('post/', views.getPosts.as_view()),
     path('post/<slug:slug_post>/', views.getPost.as_view()),
@@ -24,5 +25,8 @@ urlpatterns = [
     path('logout/', views.LogoutView.as_view(), name ='logout'),
     path('signup/', views.CreateUserView.as_view(), name = 'signup'),
     path('data/user/', views.getUser.as_view()),
+    path('profiles/', views.getProfiles.as_view()),
 
+    path('createParticipant/', views.createParticipant.as_view()),
+    path('getChats/', views.getParticipant.as_view()),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

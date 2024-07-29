@@ -4,10 +4,9 @@ import axios from "axios";
 // Define the Login function.
 import { Container, Row, Col, Card, Form  } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-export const Posts = ({ data }) => {
-    console.log('wirst'.split(''))
 
-    console.log('wirst'.split('').includes('w'))
+export const Posts = ({ data }) => {
+
     const [filterType, setFilterType] = useState('');
     const [posts, setPosts] = useState(data); 
     const [filteredPosts, setFilteredPosts] = useState(data);

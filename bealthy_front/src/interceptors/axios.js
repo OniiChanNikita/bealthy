@@ -1,5 +1,6 @@
 import axios from "axios";
 
+ console.log(localStorage.getItem('refresh_token'))
 
 let refresh = false;
 axios.interceptors.response.use(resp => resp, async error => {
@@ -10,22 +11,25 @@ if (error.response == undefined){
   if (error.response.status === 401 && !refresh) {     
      refresh = true;
      console.log(localStorage.getItem('refresh_token'))
-     const response = await axios.post(
+      const response = await axios.post(
           'http://localhost:8000/api/token/refresh/', 
           {      
-               refresh:localStorage.getItem('refresh_token')
+               "refresh":localStorage.getItem('refresh_token')
           }, 
           { 
                headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + localStorage.getItem('access_token')
                }
-          });    
+          }); 
+          console.log(response)
+
           if (response.status === 200) {
               localStorage.setItem('access_token', response.data.access);       
               localStorage.setItem('refresh_token', response.data.refresh);       
               return axios(error.config);
           }
+          localStorage.clear();  
+          
      }
 refresh = false;
 return error;

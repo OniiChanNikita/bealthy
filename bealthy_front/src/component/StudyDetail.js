@@ -6,6 +6,7 @@ import LoadingSpinner from './LoadingSpinner';
 
 export const StudyDetail = () => {
   const { id } = useParams();
+  const [ nameStudy, setNameStudy ] = useState(null);
   const [study, setStudy] = useState(null);
 
   useEffect(() => {
@@ -16,6 +17,7 @@ export const StudyDetail = () => {
       try {
         const response = await axios.get(url);
         const result = response.data.result[id];
+        setNameStudy(result.title)
         setStudy(result);
       } catch (error) {
         console.error('Error fetching data from PubMed:', error);
@@ -41,6 +43,10 @@ export const StudyDetail = () => {
             <a href={`https://pubmed.ncbi.nlm.nih.gov/${id}/`} target="_blank" rel="noopener noreferrer" className="btn btn-primary">View on PubMed</a>
           </p>
         )}
+        <p>or</p>
+        {study.elocationid && <p className="card-text">
+          <Link to={`/upload_research/${id}/${nameStudy}`} className="btn btn-primary">Add to your researche`s list</Link>
+        </p>}
         {study.meshheadinglist && (
           <div className="card-text">
             <strong>Keywords:</strong>
@@ -52,7 +58,7 @@ export const StudyDetail = () => {
           </div>
         )}
       </div>
-      <Link to="/" className="btn btn-secondary mt-3">Back to Search</Link>
+      <Link to="/pubmed" className="btn btn-secondary mt-3">Back to Search</Link>
     </div>
   );
 };

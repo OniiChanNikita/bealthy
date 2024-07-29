@@ -18,6 +18,7 @@ export function Navigation() {
         {isAuth ? <Nav.Link href="/exercises">Exercises</Nav.Link> : null}
         {isAuth ? <Nav.Link href="/pubmed">PubMed </Nav.Link> : null}
         {isAuth ? <Nav.Link href="/upload_post">Upload Post</Nav.Link> : null}
+        {isAuth ? <Nav.Link href="/profiles">Profiles</Nav.Link> : null}
         </Nav>
 
         <Nav>
