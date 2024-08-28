@@ -15,6 +15,7 @@ import {PubMedSearch} from './component/PubMedSearch';
 import {StudyDetail} from './component/StudyDetail';
 import {MessageTest} from './component/MessageTest';
 import {MessageUsersBox} from './component/MessageUsersBox';
+import {MessageUsersVoidBox} from './component/MessageUsersVoidBox';
 import {MessageBox} from './component/MessageBox';
 import {UploadResearch} from './component/UploadResearch';
 import withLoading from './component/withLoading';
@@ -110,7 +111,8 @@ function App() {
         <Route path='/profiles/' element={<Profiles/>}/>
 
         <Route path="/chat" element={<MessageTest/>} />
-        <Route path="/message" element={<MessageUsersBox/>} />
+        <Route path="/message" element={<MessageUsersVoidBox/>} />
+        <Route path="/message/t/:slug" element={<MessageUsersBox/>} />
 
         <Route path="*" element={<NotFoundPage />} />
       </Routes>

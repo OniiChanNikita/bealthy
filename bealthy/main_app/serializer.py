@@ -1,7 +1,20 @@
 from rest_framework import serializers
-from .models import Profile, Research, Image, Post, ReviewPost, Participant, Conversation
+from .models import Profile, Research, Image, Post, ReviewPost, Participant, Conversation, Message
 from django.contrib.auth.models import User
 
+
+class UserCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['username', 'password', 'email']
+
+    def create(self, validated_data):
+        user = User.objects.create_user(
+            username=validated_data['username'],
+            password=validated_data['password'],
+            email=validated_data.get('email')
+        )
+        return user
 
 class CurrentUserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -50,7 +63,7 @@ class ReviewPostSerializer(serializers.ModelSerializer):
 class ConversationSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Conversation
-		fields = ['created_at']
+		fields = ['created_at', 'id_chat']
 
 
 class ParticipantSerializer(serializers.ModelSerializer):
@@ -60,3 +73,10 @@ class ParticipantSerializer(serializers.ModelSerializer):
 		model = Participant
 		fields = ['conversation', 'user', 'id']
 
+class MessageSerializer(serializers.ModelSerializer):
+	conversation = ConversationSerializer(many=False, read_only=True) 
+	sender = ProfileSerializer(many=False, read_only=True)
+	
+	class Meta:
+		model = Message
+		fields = ['conversation', 'sender', 'content', 'timestamp']

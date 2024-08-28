@@ -25,35 +25,20 @@ export const Signup = () => {
         },
       }
     );
-    localStorage.setItem('userData', resp.data.slug_profile);
+    localStorage.clear();
 
-    console.log(resp.data.res, localStorage.getItem('userData'))
-    if (resp.data.res === 'created'){
-      const {data} = await axios.post(
-        'http://localhost:8000/api/token/',
-        user,
-        {
-          headers: {
-            'Content-Type': 'application/json'
-          },
-        }
-      );
-      alert(data.access)
+    console.log(resp)
 
-      localStorage.clear();
+    localStorage.setItem('access_token', resp.data.access);
 
-      localStorage.setItem('access_token', data.access);
+    localStorage.setItem('refresh_token', resp.data.refresh); 
+      
+    localStorage.setItem('userData', resp.data.profile.slug_profile);
 
-      localStorage.setItem('refresh_token', data.refresh);  
-
-      localStorage.setItem('username', username) 
+    localStorage.setItem('username', username) 
 
       //axios.defaults.headers.common['Authorization'] = `Bearer ${data['access']}`;
-
-      window.location.href = '/'
-    } else if(resp.data.res === 'not_created'){
-      console.log('error create user')
-    }
+    window.location.href = '/'
 
     
     

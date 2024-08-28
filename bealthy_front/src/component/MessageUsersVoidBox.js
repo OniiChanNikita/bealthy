@@ -1,17 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, Link, useParams } from 'react-router-dom';
 import { Container, Row, Col, ListGroup, Card, Form, Button, Image } from 'react-bootstrap';
-import { w3cwebsocket as W3CWebSocket } from "websocket";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
 import LoadingSpinner from './LoadingSpinner';
-import MessageBox from './MessageBox'
 
-export const MessageUsersBox = () => {
+export const MessageUsersVoidBox = () => {
   const [chats, setChats] = useState(null)
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [yourUser, setYourUser] = useState(null)
-  const [participant, setParticipant] = useState(null)
 
 
 
@@ -25,33 +20,30 @@ export const MessageUsersBox = () => {
         },
       });
       setChats(response.data)
-      setSelectedUser(response.data[0])
-    }
-    funcGetChats()
-  }, [])
-
-  useEffect(() =>{
-    const funcGetChats = async () =>{
-      const response = await axios.get('http://localhost:8000/data/user/', //get participant
-        {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + localStorage.getItem('access_token')
-        },
-      });
-      console.log(response.data)
-      setYourUser(response.data)
     }
     funcGetChats()
   }, [])
 
   
-  if (!chats || !selectedUser) {
+
+ /* useEffect(() => {
+    //if newMessage !== null 
+  }, [setNewMessage])*/
+
+
+  
+
+  
+
+ /* const handleUserClick = (user) => {
+    setSelectedUser(user);
+  };*/
+
+  if (!chats) {
     return <LoadingSpinner/>
   }
   else{
     console.log(chats)
-    console.log(selectedUser)
   }
   return (
     <Container className="my-5 w-90">
@@ -63,10 +55,10 @@ export const MessageUsersBox = () => {
               <ListGroup>
                 {chats.map(userChat => (
                   <ListGroup.Item 
-                    style={{padding: "", paddingBottom: '10px'}}
+                    style={{padding: ""}}
                     key={userChat.user.name.id} 
                     //onClick={() => handleUserClick(userChat)} 
-                    active={selectedUser.user.name.id === userChat.user.name.id}
+                    active
                     className="d-flex align-items-center overflow-hidden"
                   >
                   <Link to={'/message/t/'+userChat.conversation.id_chat} style={{margin: "5px", width: '100%', color: 'white', textDecoration: 'none'}}>
@@ -83,10 +75,7 @@ export const MessageUsersBox = () => {
         <Col md={7}>
           <Card className="border-0 shadow-lg rounded overflow-hidden">
             <Card.Body style={{minHeight: '500px'}}>
-            <MessageBox 
-             selectedUser={{selectedUser}}
-             yourUser={{yourUser}}
-             />
+            
             </Card.Body>
           </Card>
         </Col>

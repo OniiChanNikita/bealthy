@@ -23,10 +23,11 @@ urlpatterns = [
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'), 
 
     path('logout/', views.LogoutView.as_view(), name ='logout'),
-    path('signup/', views.CreateUserView.as_view(), name = 'signup'),
+    path('signup/', views.UserRegisterView.as_view(), name = 'signup'),
     path('data/user/', views.getUser.as_view()),
     path('profiles/', views.getProfiles.as_view()),
 
     path('createParticipant/', views.createParticipant.as_view()),
     path('getChats/', views.getParticipant.as_view()),
+    path('getMessage/', views.getMessage.as_view()),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

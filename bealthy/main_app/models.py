@@ -88,6 +88,7 @@ class ReviewPost(models.Model):
 
 class Conversation(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
+    id_chat = models.SlugField(unique=True, blank=True)
 
     def __str__(self):
         return f"Conversation {self.id} created at {self.created_at}"

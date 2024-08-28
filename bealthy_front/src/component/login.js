@@ -31,7 +31,6 @@ export const Login = () => {
 
     localStorage.setItem('refresh_token', data.refresh);  
 
-
  
     const user_data = await axios.get(
       'http://localhost:8000/data/user/',

@@ -2,7 +2,7 @@
 import json
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import AsyncWebsocketConsumer
-from .models import Message, Profile, Conversation
+from .models import Message, Profile, Conversation, Participant
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
 from channels.db import database_sync_to_async
@@ -11,17 +11,18 @@ class TextRoomConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.room_name = self.scope['url_route']['kwargs']['room_name']
         self.room_group_name = f'chat_{self.room_name}'
+        self.conversation_id = await self.getConversation(self.room_name)
 
         # Join room group
-        async_to_sync(self.channel_layer.group_add)(
+        await self.channel_layer.group_add(
             self.room_group_name,
             self.channel_name
         )
-        self.accept()
+        await self.accept()
 
     async def disconnect(self, close_code):
         # Leave room group
-        async_to_sync(self.channel_layer.group_discard)(
+        await self.channel_layer.group_discard(
             self.room_group_name,
             self.channel_name
         )
@@ -30,18 +31,20 @@ class TextRoomConsumer(AsyncWebsocketConsumer):
         try:
             # Получаем данные из WebSocket сообщения
             text_data_json = json.loads(text_data)
+            print(text_data_json)
             message = text_data_json['message']
             user_id = self.scope['user'].id
+            sender = self.scope['user'].username
 
             await self.save_message(self.conversation_id, user_id, message)
             
             # Получение профиля пользователя
             await self.channel_layer.group_send(
-            self.conversation_group_name,
+            self.room_group_name,
                 {
                     'type': 'chat_message',
                     'message': message,
-                    'user_id': user_id
+                    'sender': sender
                 }
             )
         except User.DoesNotExist as e:
@@ -66,14 +69,17 @@ class TextRoomConsumer(AsyncWebsocketConsumer):
     async def chat_message(self, event):
         # Receive message from room group
         message = event['message']
-        user_id = event['user_id']
-        user = await self.get_user(user_id)
+        sender = event['sender']
 
         # Send message to WebSocket
         await self.send(text_data=json.dumps({
             'message': message,
-            'username': user.username
+            'sender': sender
         }))
+
+    @database_sync_to_async
+    def getConversation(self, room_name):
+        return Conversation.objects.get(id_chat=room_name).id
 
     @database_sync_to_async
     def save_message(self, conversation_id, user_id, message):

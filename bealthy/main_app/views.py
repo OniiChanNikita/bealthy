@@ -15,9 +15,9 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-from .serializer import ProfileSerializer, ResearchSerializer, ImageSerializer, PostSerializer, CurrentUserSerializer, ReviewPostSerializer, ParticipantSerializer
+from .serializer import ProfileSerializer, ResearchSerializer, ImageSerializer, PostSerializer, CurrentUserSerializer, ReviewPostSerializer, ParticipantSerializer, MessageSerializer, UserCreateSerializer
 
-from .models import Profile, Research, Image, Post, ReviewPost, Conversation, Participant
+from .models import Profile, Research, Image, Post, ReviewPost, Conversation, Participant, Message
 from django.contrib.auth.models import User
 
 from django.utils.crypto import get_random_string
@@ -49,22 +49,37 @@ class LogoutView(APIView):
 		except Exception as e:
 			return Response({"error": "error"})
 
-class CreateUserView(APIView):
+# class CreateUserView(APIView):
+# 	permission_classes = ()
+# 	authentication_classes = ()
+# 	def post(self, request):
+# 		print(request.data)
+# 		if User.objects.filter(username = request.data.get('username')).first() == None:
+# 			user = User.objects.create_user(username=request.data.get('username'), email=request.data.get('email'), password=request.data.get('password'))
+# 			user.save()
+# 			prof.save()
+# 			print('work')
+# 			return Response(ProfileSerializer(prof, many=False).data)
+# 		else:
+# 			return Response({'error': 'username is exist'})
+# 	print('not work')
+
+class UserRegisterView(APIView):
 	permission_classes = ()
 	authentication_classes = ()
 	def post(self, request):
-		print(request.data)
-		if request.data.get('username') == None:
-			user = User.objects.create_user(username=request.data.get('username'), email=request.data.get('email'), password=request.data.get('password'))
-			user.save()
+		serializer = UserCreateSerializer(data=request.data)
+		if serializer.is_valid():
+			user = serializer.save()
 			prof = Profile.objects.create(name = User.objects.get(username = request.data.get('username')), rating = 0, hidden_rating = 0, qualification = False, slug_profile = get_random_string(8, '0123456789'), description='', subscriptions=0)
 			prof.save()
-			print('work')
-			return Response(ProfileSerializer(prof, many=False).data)
-		else:
-			return Response({'error': 'username is exist'})
-	print('not work')
-
+			refresh = RefreshToken.for_user(user)
+			return Response({
+				'refresh': str(refresh),
+				'access': str(refresh.access_token),
+				'profile': ProfileSerializer(prof, many=False).data,
+			}, status=status.HTTP_201_CREATED)
+		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class GetResearch(APIView):
@@ -223,7 +238,7 @@ class createParticipant(APIView):
 			))
 		)
 		if boolCheck == True:
-			conv = Conversation.objects.create()
+			conv = Conversation.objects.create(id_chat = get_random_string(16, '0123456789'))
 			user1 = Participant.objects.create(conversation = conv, user = Profile.objects.get(name = User.objects.get(username = request.data["user1"])))		
 			user1 = Participant.objects.create(conversation = conv, user = Profile.objects.get(name = User.objects.get(username = request.data["user2"])))
 			return Response({'status': 'created'})
@@ -245,6 +260,33 @@ class getParticipant(APIView):
 		users = Participant.objects.filter(conversation__in=chats).exclude(user=Profile.objects.get(name = request.user))
 		print(users)
 		return Response(ParticipantSerializer(users, many=True).data)
+
+
+class getMessage(APIView):
+	permission_classes = [IsAuthenticated, ]
+	authentication_classes = [JWTAuthentication, ]
+
+	def post(self, request):
+		print(request.data['name'])
+		set1 = set(
+				[partic.conversation for partic in Participant.objects.filter(user = Profile.objects.get(name = request.user))]
+			)
+		set2 = set(
+				[partic.conversation for partic in Participant.objects.filter(user = Profile.objects.get(name = User.objects.get(username = request.data["name"]['username'])))]
+			)
+		boolCheck = set1.isdisjoint(set2)
+
+		if boolCheck == False:
+			conversation = set1 & set2
+			print('conversation------>', list(conversation)[0])
+			messages = Message.objects.filter(conversation = list(conversation)[0])
+			#if Participant.objects.filter(conversation = Conversation.objects.get(created_at = request.data.get), user = Profile.objects.get(name = request.user)).exists() != False:
+			print(MessageSerializer(messages, many=True).data)
+			return Response(MessageSerializer(messages, many=True).data)
+		else:
+			return Response({'status': 'error'})
+
+
 
 
 
